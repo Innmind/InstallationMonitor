@@ -113,7 +113,7 @@ USAGE;
             ->expects($this->once())
             ->method('execute')
             ->with($this->callback(static function($command): bool {
-                return (string) $command === "monitor 'oversee'" &&
+                return (string) $command === "installation-monitor 'oversee'" &&
                     $command->toBeRunInBackground() &&
                     $command->workingDirectory() === '/tmp';
             }));
