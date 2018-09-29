@@ -30,6 +30,6 @@ class LocalTest extends TestCase
         $this->assertNull($listen());
         $end = microtime(true);
 
-        $this->assertEquals(1, $end - $start, '', 0.015);
+        $this->assertEquals(1, $end - $start, '', 0.02);
     }
 }

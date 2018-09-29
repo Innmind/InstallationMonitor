@@ -58,6 +58,6 @@ class SocketTest extends TestCase
         $this->assertInstanceOf(StreamInterface::class, $events);
         $this->assertSame(Event::class, (string) $events->type());
         $this->assertCount(0, $events); // empty as from here we can't push events to the server
-        $this->assertEquals(2, $end - $start, '', 0.015);
+        $this->assertEquals(2, $end - $start, '', 0.02);
     }
 }
