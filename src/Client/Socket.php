@@ -69,7 +69,7 @@ final class Socket implements Client
             } else {
                 ++$timedOutIterations;
             }
-        } while($timedOutIterations < 2);
+        } while ($timedOutIterations < 2);
 
         $socket->close();
 
