@@ -1,0 +1,45 @@
+{
+    "name": "innmind/installation-monitor",
+    "type": "library",
+    "description": "Simple socket to accumulate and dispatch system events",
+    "keywords": [],
+    "homepage": "http://github.com/Innmind/InstallationMonitor",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Baptiste Langlade",
+            "email": "langlade.baptiste@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "http://github.com/Innmind/InstallationMonitor/issues"
+    },
+    "require": {
+        "php": "~7.2",
+        "innmind/immutable": "^2.9",
+        "innmind/json": "^1.0",
+        "innmind/socket": "^1.2",
+        "innmind/cli": "^1.3",
+        "innmind/server-control": "^2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Innmind\\InstallationMonitor\\": "src/"
+        },
+        "files": ["src/bootstrap.php"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Innmind\\InstallationMonitor\\": "tests/",
+            "Fixture\\Innmind\\InstallationMonitor\\": "fixtures/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~7.0",
+        "giorgiosironi/eris": "^0.10.0"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit --colors=always"
+    },
+    "bin": ["installation-monitor"]
+}
