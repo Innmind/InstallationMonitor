@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\GuiltySparkMonitor\Event;
+namespace Innmind\InstallationMonitor\Event;
 
-use Innmind\GuiltySparkMonitor\Exception\DomainException;
+use Innmind\InstallationMonitor\Exception\DomainException;
 use Innmind\Immutable\Str;
 
 final class Name

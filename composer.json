@@ -1,9 +1,9 @@
 {
-    "name": "innmind/guilty-spark-monitor",
+    "name": "innmind/installation-monitor",
     "type": "library",
     "description": "Simple socket to accumulate and dispatch system events",
     "keywords": [],
-    "homepage": "http://github.com/Innmind/GuiltySparkMonitor",
+    "homepage": "http://github.com/Innmind/InstallationMonitor",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         }
     ],
     "support": {
-        "issues": "http://github.com/Innmind/GuiltySparkMonitor/issues"
+        "issues": "http://github.com/Innmind/InstallationMonitor/issues"
     },
     "require": {
         "php": "~7.2",
@@ -21,13 +21,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Innmind\\GuiltySparkMonitor\\": "src/"
+            "Innmind\\InstallationMonitor\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Innmind\\GuiltySparkMonitor\\": "tests/",
-            "Fixture\\Innmind\\GuiltySparkMonitor\\": "fixtures/"
+            "Tests\\Innmind\\InstallationMonitor\\": "tests/",
+            "Fixture\\Innmind\\InstallationMonitor\\": "fixtures/"
         }
     },
     "require-dev": {

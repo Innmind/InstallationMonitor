@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\GuiltySparkMonitor;
+namespace Innmind\InstallationMonitor;
 
-use Innmind\GuiltySparkMonitor\Event\Name;
+use Innmind\InstallationMonitor\Event\Name;
 use Innmind\Immutable\MapInterface;
 
 final class Event

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\GuiltySparkMonitor;
+namespace Innmind\InstallationMonitor;
 
 interface IncomingConnection
 {

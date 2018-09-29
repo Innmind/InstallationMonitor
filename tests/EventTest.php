@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace Tests\Innmind\GuiltySparkMonitor;
+namespace Tests\Innmind\InstallationMonitor;
 
-use Innmind\GuiltySparkMonitor\{
+use Innmind\InstallationMonitor\{
     Event,
     Event\Name,
 };

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace Tests\Innmind\GuiltySparkMonitor\Event;
+namespace Tests\Innmind\InstallationMonitor\Event;
 
-use Innmind\GuiltySparkMonitor\{
+use Innmind\InstallationMonitor\{
     Event\Name,
     Exception\DomainException,
 };
