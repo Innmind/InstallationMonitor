@@ -40,5 +40,6 @@
     },
     "scripts": {
         "test": "vendor/bin/phpunit --colors=always"
-    }
+    },
+    "bin": ["installation-monitor"]
 }
