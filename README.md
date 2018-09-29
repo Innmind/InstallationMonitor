@@ -33,7 +33,7 @@ use Innmind\Socket\Address\Unix as Address;
 use Innmind\Immutable\Map;
 
 $client = bootstrap()['client']['socket'](
-    new Address($pathToInstallationMonitor.'/var/server')
+    new Address('/tmp/installation-monitor')
 );
 $client->send(
     new Event(
