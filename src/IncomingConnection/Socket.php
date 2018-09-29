@@ -5,23 +5,28 @@ namespace Innmind\InstallationMonitor\IncomingConnection;
 
 use Innmind\InstallationMonitor\{
     IncomingConnection,
-    Events,
     Event,
+    Serialize,
 };
 use Innmind\Socket\Server\Connection;
 
 final class Socket implements IncomingConnection
 {
     private $connection;
+    private $serialize;
 
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
+        $this->serialize = new Serialize;
     }
 
     public function notify(Event ...$events): void
     {
-        $events = new Events(...$events);
-        $events->send($this->connection);
+        foreach ($events as $event) {
+            $this->connection->write(
+                ($this->serialize)($event)
+            );
+        }
     }
 }

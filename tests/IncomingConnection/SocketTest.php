@@ -33,17 +33,12 @@ class SocketTest extends TestCase
         $connection
             ->expects($this->at(0))
             ->method('write')
-            ->with(Str::of("incoming_events:2\n"))
+            ->with(Str::of('{"name":"foo","payload":[]}'))
             ->will($this->returnSelf());
         $connection
             ->expects($this->at(1))
             ->method('write')
-            ->with(Str::of('{"name":"foo","payload":[]}'."\n"))
-            ->will($this->returnSelf());
-        $connection
-            ->expects($this->at(2))
-            ->method('write')
-            ->with(Str::of('{"name":"bar","payload":[]}'."\n"))
+            ->with(Str::of('{"name":"bar","payload":[]}'))
             ->will($this->returnSelf());
 
         $this->assertNull($socket->notify(
