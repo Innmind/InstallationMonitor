@@ -1,6 +1,6 @@
 {
     "name": "innmind/installation-monitor",
-    "type": "library",
+    "type": "project",
     "description": "Simple socket to accumulate and dispatch system events",
     "keywords": [],
     "homepage": "http://github.com/Innmind/InstallationMonitor",
