@@ -10,7 +10,10 @@ use Innmind\CLI\Commands;
 
 function bootstrap(): array
 {
+    $localServerAddress = new Address('/tmp/installation-monitor');
+
     return [
+        'local_server_address' => $localServerAddress,
         'commands' => static function(Address $address, ServerControl $server): Commands {
             return new Commands(
                 new Command\Oversee(
@@ -23,8 +26,8 @@ function bootstrap(): array
             );
         },
         'client' => [
-            'socket' => static function(Address $address): Client {
-                return new Client\Socket($address);
+            'socket' => static function(Address $address = null) use ($localServerAddress): Client {
+                return new Client\Socket($address ?? $localServerAddress);
             },
             'silence' => static function(Client $client): Client {
                 return new Client\Silence($client);
