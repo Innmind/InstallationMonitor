@@ -25,6 +25,7 @@ class BootstrapTest extends TestCase
         $this->assertInstanceOf(Socket::class, $services['client']['socket'](
             new Address('/tmp/foo')
         ));
+        $this->assertInstanceOf(Socket::class, $services['client']['socket']());
         $this->assertInternalType('callable', $services['client']['silence']);
         $this->assertInstanceOf(Silence::class, $services['client']['silence'](
             $this->createMock(Client::class)

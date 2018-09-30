@@ -32,7 +32,7 @@ new class extends Main {
     protected function main(Environment $env): void
     {
         $run = bootstrap()['commands'](
-            new Address('/tmp/installation-monitor'),
+            bootstrap()['local_server_address'],
             ServerFactory::build()
         );
         $run($env);
