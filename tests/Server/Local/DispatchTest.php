@@ -29,27 +29,25 @@ class DispatchTest extends TestCase
         $connection1
             ->expects($this->at(0))
             ->method('write')
-            ->with(Str::of('{"name":"foo","payload":[]}'))
+            ->with(Str::of('{"name":"foo","payload":[]}')->toEncoding('ASCII'))
             ->will($this->throwException(new FailedToWriteToStream));
         $connection1
             ->expects($this->at(1))
             ->method('write')
-            ->with(Str::of('{"name":"bar","payload":[]}'));
+            ->with(Str::of('{"name":"bar","payload":[]}')->toEncoding('ASCII'));
         $connection3
             ->expects($this->once())
             ->method('write')
-            ->with(Str::of('{"name":"foo","payload":[]}'));
+            ->with(Str::of('{"name":"foo","payload":[]}')->toEncoding('ASCII'));
         $connection2
             ->expects($this->never())
             ->method('write');
         $connection4
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('write')
-            ->with(Str::of('{"name":"foo","payload":[]}'));
-        $connection4
-            ->expects($this->at(1))
-            ->method('write')
-            ->with(Str::of('{"name":"bar","payload":[]}'));
+            ->with(
+                Str::of('{"name":"foo","payload":[]}ø{"name":"bar","payload":[]}')->toEncoding('ASCII')
+            );
 
 
         $this->assertNull($dispatch(new ConnectionReceived($connection1)));

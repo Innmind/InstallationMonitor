@@ -32,14 +32,20 @@ class SocketTest extends TestCase
 
         $client = new Socket($address);
 
-        $this->assertNull($client->send(new Event(
-            new Event\Name('bar'),
-            new Map('string', 'variable')
-        )));
+        $this->assertNull($client->send(
+            new Event(
+                new Event\Name('foo'),
+                new Map('string', 'variable')
+            ),
+            new Event(
+                new Event\Name('bar'),
+                new Map('string', 'variable')
+            )
+        ));
 
         $connection = $server->accept();
         $this->assertSame(
-            '{"name":"bar","payload":[]}',
+            '{"name":"foo","payload":[]}ø{"name":"bar","payload":[]}',
             (string) $connection->read()
         );
     }

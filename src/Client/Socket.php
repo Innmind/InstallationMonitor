@@ -6,8 +6,7 @@ namespace Innmind\InstallationMonitor\Client;
 use Innmind\InstallationMonitor\{
     Client,
     Event,
-    Serialize,
-    Unserialize,
+    Events,
 };
 use Innmind\Socket\{
     Address\Unix as Address,
@@ -18,30 +17,29 @@ use Innmind\TimeContinuum\ElapsedPeriod;
 use Innmind\Immutable\{
     StreamInterface,
     Stream,
+    Str,
 };
 
 final class Socket implements Client
 {
     private $address;
-    private $serialize;
-    private $unserialize;
 
     public function __construct(Address $address)
     {
         $this->address = $address;
-        $this->serialize = new Serialize;
-        $this->unserialize = new Unserialize;
     }
 
     public function send(Event ...$events): void
     {
+        $events = new Events(...$events);
+
+        if ($events->count() === 0) {
+            return;
+        }
+
         $socket = new Unix($this->address);
 
-        foreach ($events as $event) {
-            $socket->write(
-                ($this->serialize)($event)
-            );
-        }
+        $socket->write($events->toString());
 
         $socket->close();
     }
@@ -56,16 +54,14 @@ final class Socket implements Client
         $select = new Select(new ElapsedPeriod(1000)); // 1 second timeout
         $select = $select->forRead($socket);
 
-        $events = Stream::of(Event::class);
+        $events = Str::of('', 'ASCII');
         $timedOutIterations = 0;
 
         do {
             $sockets = $select();
 
             if ($sockets->get('read')->contains($socket)) {
-                $events = $events->add(
-                    ($this->unserialize)($socket->read())
-                );
+                $events = $events->append($socket->read());
             } else {
                 ++$timedOutIterations;
             }
@@ -73,6 +69,6 @@ final class Socket implements Client
 
         $socket->close();
 
-        return $events;
+        return Stream::of(Event::class, ...Events::from($events));
     }
 }
