@@ -28,6 +28,9 @@ final class Events implements \Iterator, \Countable
             ...$string
                 ->toEncoding('ASCII')
                 ->split(self::boundary())
+                ->filter(static function(Str $event): bool {
+                    return $event->length() > 0;
+                })
                 ->reduce(
                     new Sequence,
                     static function(SequenceInterface $events, Str $event) use ($unserialize): SequenceInterface {

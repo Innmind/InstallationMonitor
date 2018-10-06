@@ -96,4 +96,11 @@ class EventsTest extends TestCase
             )
         );
     }
+
+    public function testEmptyFrom()
+    {
+        $events = Events::from(Str::of(''));
+
+        $this->assertEquals(new Events, $events);
+    }
 }
