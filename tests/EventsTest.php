@@ -52,6 +52,7 @@ class EventsTest extends TestCase
         $string = $events->toString();
 
         $this->assertInstanceOf(Str::class, $string);
+        $this->assertSame('ASCII', (string) $string->encoding());
         $this->assertSame(
             '{"name":"foo","payload":[]}ø{"name":"bar","payload":[]}',
             (string) $string

@@ -26,6 +26,7 @@ final class Events implements \Iterator, \Countable
 
         return new self(
             ...$string
+                ->toEncoding('ASCII')
                 ->split(self::boundary())
                 ->reduce(
                     new Sequence,
@@ -43,7 +44,8 @@ final class Events implements \Iterator, \Countable
             ->map(function(Event $event): Str {
                 return ($this->serialize)($event);
             })
-            ->join(self::boundary());
+            ->join(self::boundary())
+            ->toEncoding('ASCII');
     }
 
     public function count(): int

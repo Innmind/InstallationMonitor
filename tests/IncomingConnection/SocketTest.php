@@ -33,7 +33,9 @@ class SocketTest extends TestCase
         $connection
             ->expects($this->once())
             ->method('write')
-            ->with(Str::of('{"name":"foo","payload":[]}ø{"name":"bar","payload":[]}'))
+            ->with(
+                Str::of('{"name":"foo","payload":[]}ø{"name":"bar","payload":[]}')->toEncoding('ASCII')
+            )
             ->will($this->returnSelf());
 
         $this->assertNull($socket->notify(
