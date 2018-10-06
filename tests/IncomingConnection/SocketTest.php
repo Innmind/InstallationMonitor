@@ -31,14 +31,9 @@ class SocketTest extends TestCase
             $connection = $this->createMock(Connection::class)
         );
         $connection
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('write')
-            ->with(Str::of('{"name":"foo","payload":[]}'))
-            ->will($this->returnSelf());
-        $connection
-            ->expects($this->at(1))
-            ->method('write')
-            ->with(Str::of('{"name":"bar","payload":[]}'))
+            ->with(Str::of('{"name":"foo","payload":[]}ø{"name":"bar","payload":[]}'))
             ->will($this->returnSelf());
 
         $this->assertNull($socket->notify(

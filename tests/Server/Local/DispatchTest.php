@@ -43,13 +43,9 @@ class DispatchTest extends TestCase
             ->expects($this->never())
             ->method('write');
         $connection4
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('write')
-            ->with(Str::of('{"name":"foo","payload":[]}'));
-        $connection4
-            ->expects($this->at(1))
-            ->method('write')
-            ->with(Str::of('{"name":"bar","payload":[]}'));
+            ->with(Str::of('{"name":"foo","payload":[]}ø{"name":"bar","payload":[]}'));
 
 
         $this->assertNull($dispatch(new ConnectionReceived($connection1)));
