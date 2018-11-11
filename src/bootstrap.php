@@ -18,6 +18,7 @@ function bootstrap(): array
             return new Commands(
                 new Command\Oversee(
                     new Server\Local(
+                        $os->sockets(),
                         $address,
                         new ElapsedPeriod(1000) // 1 second
                     ),

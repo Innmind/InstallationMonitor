@@ -7,9 +7,9 @@ use Innmind\InstallationMonitor\{
     Server\Local\Dispatch,
     Store,
 };
+use Innmind\OperatingSystem\Sockets;
 use Innmind\Socket\{
-    Address\Unix as Address,
-    Server\Unix,
+    Address\Unix,
     Loop,
     Loop\Strategy,
     Event\ConnectionReceived,
@@ -17,25 +17,28 @@ use Innmind\Socket\{
     Event\DataReceived,
 };
 use Innmind\EventBus\EventBus;
+use Innmind\TimeContinuum\ElapsedPeriod;
 use Innmind\Immutable\{
     SetInterface,
     Set,
     Map,
 };
-use Innmind\TimeContinuum\ElapsedPeriod;
 
 final class Local
 {
+    private $sockets;
     private $address;
     private $timeout;
     private $strategy;
     private $dispatch;
 
     public function __construct(
-        Address $address,
+        Sockets $sockets,
+        Unix $address,
         ElapsedPeriod $timeout,
         Strategy $strategy = null
     ) {
+        $this->sockets = $sockets;
         $this->address = $address;
         $this->timeout = $timeout;
         $this->strategy = $strategy;
@@ -44,8 +47,7 @@ final class Local
 
     public function __invoke(): void
     {
-
-        $server = Unix::recoverable($this->address);
+        $server = $this->sockets->takeOver($this->address);
         $loop = new Loop(
             new EventBus\Map(
                 Map::of('string', 'callable')

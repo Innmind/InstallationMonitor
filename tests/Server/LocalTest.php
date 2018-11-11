@@ -7,8 +7,10 @@ use Innmind\InstallationMonitor\Server\Local;
 use Innmind\Socket\{
     Address\Unix,
     Loop\Strategy,
+    Server\Unix as Socket,
 };
 use Innmind\TimeContinuum\ElapsedPeriod;
+use Innmind\OperatingSystem\Sockets;
 use PHPUnit\Framework\TestCase;
 
 class LocalTest extends TestCase
@@ -16,7 +18,8 @@ class LocalTest extends TestCase
     public function testInvokation()
     {
         $listen = new Local(
-            new Unix('/tmp/local-server'),
+            $sockets = $this->createMock(Sockets::class),
+            $address = new Unix('/tmp/local-server'),
             new ElapsedPeriod(1000), // 1 second
             new class implements Strategy {
                 public function __invoke(): bool
@@ -25,6 +28,11 @@ class LocalTest extends TestCase
                 }
             }
         );
+        $sockets
+            ->expects($this->once())
+            ->method('takeOver')
+            ->with($address)
+            ->willReturn(Socket::recoverable($address));
 
         $start = microtime(true);
         $this->assertNull($listen());

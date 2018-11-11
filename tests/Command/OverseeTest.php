@@ -15,6 +15,7 @@ use Innmind\CLI\{
 };
 use Innmind\Socket\{
     Address\Unix as Address,
+    Server\Unix,
     Loop\Strategy,
 };
 use Innmind\TimeContinuum\ElapsedPeriod;
@@ -23,6 +24,7 @@ use Innmind\Server\Control\{
     Server\Processes,
 };
 use Innmind\Url\Path;
+use Innmind\OperatingSystem\Sockets;
 use Innmind\Immutable\Map;
 use PHPUnit\Framework\TestCase;
 
@@ -34,6 +36,7 @@ class OverseeTest extends TestCase
             Command::class,
             new Oversee(
                 new Local(
+                    $this->createMock(Sockets::class),
                     new Address('/tmp/foo'),
                     new ElapsedPeriod(1000)
                 ),
@@ -56,6 +59,7 @@ USAGE;
             $usage,
             (string) new Oversee(
                 new Local(
+                    $this->createMock(Sockets::class),
                     new Address('/tmp/foo'),
                     new ElapsedPeriod(1000)
                 ),
@@ -68,7 +72,8 @@ USAGE;
     {
         $oversee = new Oversee(
             new Local(
-                new Address('/tmp/foo'),
+                $sockets = $this->createMock(Sockets::class),
+                $address = new Address('/tmp/foo'),
                 new ElapsedPeriod(1000),
                 new class implements Strategy {
                     public function __invoke(): bool
@@ -79,6 +84,10 @@ USAGE;
             ),
             $server = $this->createMock(Server::class)
         );
+        $sockets
+            ->expects($this->once())
+            ->method('takeOver')
+            ->willReturn(Unix::recoverable($address));
         $server
             ->expects($this->never())
             ->method('processes');
@@ -94,6 +103,7 @@ USAGE;
     {
         $oversee = new Oversee(
             new Local(
+                $this->createMock(Sockets::class),
                 new Address('/tmp/foo'),
                 new ElapsedPeriod(1000),
                 new class implements Strategy {
