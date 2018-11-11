@@ -10,8 +10,7 @@ use Innmind\InstallationMonitor\{
     Client,
 };
 use Innmind\Socket\Address\Unix as Address;
-use Innmind\Server\Control\Server as ServerControl;
-use Innmind\Server\Status\Server as ServerStatus;
+use Innmind\OperatingSystem\OperatingSystem;
 use Innmind\CLI\Commands;
 use PHPUnit\Framework\TestCase;
 
@@ -36,8 +35,7 @@ class BootstrapTest extends TestCase
             Commands::class,
             $services['commands'](
                 new Address('/tmp/foo'),
-                $this->createMock(ServerControl::class),
-                $this->createMock(ServerStatus::class)
+                $this->createMock(OperatingSystem::class)
             )
         );
     }
