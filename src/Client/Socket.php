@@ -8,12 +8,10 @@ use Innmind\InstallationMonitor\{
     Event,
     Events,
 };
-use Innmind\Socket\{
-    Address\Unix as Address,
-    Client\Unix,
-};
+use Innmind\Socket\Address\Unix;
 use Innmind\Stream\Select;
 use Innmind\TimeContinuum\ElapsedPeriod;
+use Innmind\OperatingSystem\Sockets;
 use Innmind\Immutable\{
     StreamInterface,
     Stream,
@@ -22,10 +20,12 @@ use Innmind\Immutable\{
 
 final class Socket implements Client
 {
+    private $sockets;
     private $address;
 
-    public function __construct(Address $address)
+    public function __construct(Sockets $sockets, Unix $address)
     {
+        $this->sockets = $sockets;
         $this->address = $address;
     }
 
@@ -37,7 +37,7 @@ final class Socket implements Client
             return;
         }
 
-        $socket = new Unix($this->address);
+        $socket = $this->sockets->connectTo($this->address);
 
         $socket->write($events->toString());
 
@@ -49,7 +49,7 @@ final class Socket implements Client
      */
     public function events(): StreamInterface
     {
-        $socket = new Unix($this->address);
+        $socket = $this->sockets->connectTo($this->address);
 
         $select = new Select(new ElapsedPeriod(1000)); // 1 second timeout
         $select = $select->forRead($socket);

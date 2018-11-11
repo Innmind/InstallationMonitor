@@ -4,7 +4,10 @@ declare(strict_types = 1);
 namespace Innmind\InstallationMonitor;
 
 use Innmind\Socket\Address\Unix as Address;
-use Innmind\OperatingSystem\OperatingSystem;
+use Innmind\OperatingSystem\{
+    OperatingSystem,
+    Sockets,
+};
 use Innmind\TimeContinuum\ElapsedPeriod;
 use Innmind\CLI\Commands;
 
@@ -28,8 +31,8 @@ function bootstrap(): array
             );
         },
         'client' => [
-            'socket' => static function(Address $address = null) use ($localServerAddress): Client {
-                return new Client\Socket($address ?? $localServerAddress);
+            'socket' => static function(Sockets $sockets, Address $address = null) use ($localServerAddress): Client {
+                return new Client\Socket($sockets, $address ?? $localServerAddress);
             },
             'silence' => static function(Client $client): Client {
                 return new Client\Silence($client);

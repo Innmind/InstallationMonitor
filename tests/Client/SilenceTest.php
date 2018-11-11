@@ -9,7 +9,11 @@ use Innmind\InstallationMonitor\{
     Client,
     Event,
 };
-use Innmind\Socket\Address\Unix as Address;
+use Innmind\Socket\{
+    Address\Unix as Address,
+    Client\Unix as UnixClient,
+};
+use Innmind\OperatingSystem\Sockets;
 use Innmind\Immutable\{
     Map,
     Stream,
@@ -45,7 +49,12 @@ class SilenceTest extends TestCase
 
     public function testSilenceFailedSend()
     {
-        $client = new Silence(new Socket(new Address('/tmp/unknown')));
+        $client = new Silence(
+            new Socket(
+                $this->createMock(Sockets::class),
+                new Address('/tmp/unknown')
+            )
+        );
 
         $this->assertNull($client->send(new Event(
             new Event\Name('foo'),
@@ -72,7 +81,18 @@ class SilenceTest extends TestCase
 
     public function testSilenceFailedEventsRetrieval()
     {
-        $client = new Silence(new Socket(new Address('/tmp/unknown')));
+        $client = new Silence(
+            new Socket(
+                $sockets = $this->createMock(Sockets::class),
+                $address = new Address('/tmp/unknown')
+            )
+        );
+        $sockets
+            ->expects($this->once())
+            ->method('connectTo')
+            ->will($this->returnCallback(static function() use ($address) {
+                return new UnixClient($address);
+            }));
 
         $events = $client->events();
 

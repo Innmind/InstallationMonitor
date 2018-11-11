@@ -10,7 +10,10 @@ use Innmind\InstallationMonitor\{
     Client,
 };
 use Innmind\Socket\Address\Unix as Address;
-use Innmind\OperatingSystem\OperatingSystem;
+use Innmind\OperatingSystem\{
+    OperatingSystem,
+    Sockets,
+};
 use Innmind\CLI\Commands;
 use PHPUnit\Framework\TestCase;
 
@@ -23,9 +26,12 @@ class BootstrapTest extends TestCase
         $this->assertCount(2, $services['client']);
         $this->assertInternalType('callable', $services['client']['socket']);
         $this->assertInstanceOf(Socket::class, $services['client']['socket'](
+            $this->createMock(Sockets::class),
             new Address('/tmp/foo')
         ));
-        $this->assertInstanceOf(Socket::class, $services['client']['socket']());
+        $this->assertInstanceOf(Socket::class, $services['client']['socket'](
+            $this->createMock(Sockets::class)
+        ));
         $this->assertInternalType('callable', $services['client']['silence']);
         $this->assertInstanceOf(Silence::class, $services['client']['silence'](
             $this->createMock(Client::class)

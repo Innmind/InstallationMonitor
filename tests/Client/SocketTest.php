@@ -11,7 +11,9 @@ use Innmind\InstallationMonitor\{
 use Innmind\Socket\{
     Address\Unix as Address,
     Server\Unix as Server,
+    Client\Unix as UnixClient,
 };
+use Innmind\OperatingSystem\Sockets;
 use Innmind\Immutable\{
     Map,
     StreamInterface,
@@ -22,7 +24,13 @@ class SocketTest extends TestCase
 {
     public function testInterface()
     {
-        $this->assertInstanceOf(Client::class, new Socket(new Address('/tmp/foo')));
+        $this->assertInstanceOf(
+            Client::class,
+            new Socket(
+                $this->createMock(Sockets::class),
+                new Address('/tmp/foo')
+            )
+        );
     }
 
     public function testSend()
@@ -30,7 +38,15 @@ class SocketTest extends TestCase
         $address = new Address('/tmp/foo');
         $server = Server::recoverable($address);
 
-        $client = new Socket($address);
+        $client = new Socket(
+            $sockets = $this->createMock(Sockets::class),
+            $address
+        );
+        $sockets
+            ->expects($this->once())
+            ->method('connectTo')
+            ->with($address)
+            ->willReturn(new UnixClient($address));
 
         $this->assertNull($client->send(
             new Event(
@@ -55,7 +71,15 @@ class SocketTest extends TestCase
         $address = new Address('/tmp/foo');
         $server = Server::recoverable($address);
 
-        $client = new Socket($address);
+        $client = new Socket(
+            $sockets = $this->createMock(Sockets::class),
+            $address
+        );
+        $sockets
+            ->expects($this->once())
+            ->method('connectTo')
+            ->with($address)
+            ->willReturn(new UnixClient($address));
 
         $start = microtime(true);
         $events = $client->events();
