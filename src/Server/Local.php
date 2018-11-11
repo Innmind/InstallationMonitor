@@ -44,15 +44,14 @@ final class Local
 
     public function __invoke(): void
     {
-        $listeners = Set::of('callable', $this->dispatch);
 
         $server = Unix::recoverable($this->address);
         $loop = new Loop(
-            new EventBus(
-                (new Map('string', SetInterface::class))
-                    ->put(ConnectionReceived::class, $listeners)
-                    ->put(DataReceived::class, $listeners)
-                    ->put(ConnectionClosed::class, $listeners)
+            new EventBus\Map(
+                Map::of('string', 'callable')
+                    (ConnectionReceived::class, $this->dispatch)
+                    (DataReceived::class, $this->dispatch)
+                    (ConnectionClosed::class, $this->dispatch)
             ),
             $this->timeout,
             $this->strategy

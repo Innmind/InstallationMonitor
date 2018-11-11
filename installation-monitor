@@ -32,9 +32,10 @@ use Innmind\TimeContinuum\{
     TimeContinuum\Earth,
     Timezone\Earth\UTC,
 };
+use Innmind\OperatingSystem\OperatingSystem;
 
 new class extends Main {
-    protected function main(Environment $env): void
+    protected function main(Environment $env, OperatingSystem $os): void
     {
         $run = bootstrap()['commands'](
             bootstrap()['local_server_address'],
