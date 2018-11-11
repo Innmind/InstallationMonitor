@@ -51,10 +51,16 @@ class SilenceTest extends TestCase
     {
         $client = new Silence(
             new Socket(
-                $this->createMock(Sockets::class),
-                new Address('/tmp/unknown')
+                $sockets = $this->createMock(Sockets::class),
+                $address = new Address('/tmp/unknown')
             )
         );
+        $sockets
+            ->expects($this->once())
+            ->method('connectTo')
+            ->will($this->returnCallback(static function() use ($address) {
+                return new UnixClient($address);
+            }));
 
         $this->assertNull($client->send(new Event(
             new Event\Name('foo'),
