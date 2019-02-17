@@ -20,13 +20,13 @@ class BootstrapTest extends TestCase
         $services = bootstrap($this->createMock(OperatingSystem::class));
 
         $this->assertCount(2, $services['client']);
-        $this->assertInternalType('callable', $services['client']['ipc']);
+        $this->assertIsCallable($services['client']['ipc']);
         $this->assertInstanceOf(IPC::class, $services['client']['ipc']());
-        $this->assertInternalType('callable', $services['client']['silence']);
+        $this->assertIsCallable($services['client']['silence']);
         $this->assertInstanceOf(Silence::class, $services['client']['silence'](
             $this->createMock(Client::class)
         ));
-        $this->assertInternalType('callable', $services['commands']);
+        $this->assertIsCallable($services['commands']);
         $this->assertInstanceOf(
             Commands::class,
             $services['commands']()
