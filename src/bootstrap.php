@@ -5,10 +5,7 @@ namespace Innmind\InstallationMonitor;
 
 use Innmind\OperatingSystem\OperatingSystem;
 use Innmind\CLI\Commands;
-use Innmind\IPC\{
-    IPC,
-    Process\Name,
-};
+use Innmind\IPC\Process\Name;
 use function Innmind\IPC\bootstrap as ipc;
 
 function bootstrap(OperatingSystem $os): array
@@ -31,8 +28,8 @@ function bootstrap(OperatingSystem $os): array
             );
         },
         'client' => [
-            'socket' => static function() use ($ipc, $localServerName): Client {
-                return new Client\Socket($ipc, $localServerName);
+            'ipc' => static function() use ($ipc, $localServerName): Client {
+                return new Client\IPC($ipc, $localServerName);
             },
             'silence' => static function(Client $client): Client {
                 return new Client\Silence($client);

@@ -10,7 +10,7 @@ use Innmind\InstallationMonitor\{
     IPC\Message\EndOfTransmission,
 };
 use Innmind\IPC\{
-    IPC,
+    IPC as IPCInterface,
     Process\Name,
     Message,
     Exception\Stop,
@@ -21,12 +21,12 @@ use Innmind\Immutable\{
 };
 use Ramsey\Uuid\Uuid;
 
-final class Socket implements Client
+final class IPC implements Client
 {
     private $ipc;
     private $server;
 
-    public function __construct(IPC $ipc, Name $server)
+    public function __construct(IPCInterface $ipc, Name $server)
     {
         $this->ipc = $ipc;
         $this->server = $server;

@@ -5,7 +5,7 @@ namespace Tests\Innmind\InstallationMonitor;
 
 use function Innmind\InstallationMonitor\bootstrap;
 use Innmind\InstallationMonitor\{
-    Client\Socket,
+    Client\IPC,
     Client\Silence,
     Client,
 };
@@ -20,8 +20,8 @@ class BootstrapTest extends TestCase
         $services = bootstrap($this->createMock(OperatingSystem::class));
 
         $this->assertCount(2, $services['client']);
-        $this->assertInternalType('callable', $services['client']['socket']);
-        $this->assertInstanceOf(Socket::class, $services['client']['socket']());
+        $this->assertInternalType('callable', $services['client']['ipc']);
+        $this->assertInstanceOf(IPC::class, $services['client']['ipc']());
         $this->assertInternalType('callable', $services['client']['silence']);
         $this->assertInstanceOf(Silence::class, $services['client']['silence'](
             $this->createMock(Client::class)

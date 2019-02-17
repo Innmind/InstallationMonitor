@@ -4,14 +4,14 @@ declare(strict_types = 1);
 namespace Tests\Innmind\InstallationMonitor\Client;
 
 use Innmind\InstallationMonitor\{
-    Client\Socket,
+    Client\IPC,
     Client,
     Event,
     IPC\Message\WaitingForEvents,
     IPC\Message\EndOfTransmission,
 };
 use Innmind\IPC\{
-    IPC,
+    IPC as IPCInterface,
     Process,
     Process\Name,
     Sender,
@@ -24,14 +24,14 @@ use Innmind\Immutable\{
 };
 use PHPUnit\Framework\TestCase;
 
-class SocketTest extends TestCase
+class IPCTest extends TestCase
 {
     public function testInterface()
     {
         $this->assertInstanceOf(
             Client::class,
-            new Socket(
-                $this->createMock(IPC::class),
+            new IPC(
+                $this->createMock(IPCInterface::class),
                 new Name('foo')
             )
         );
@@ -39,8 +39,8 @@ class SocketTest extends TestCase
 
     public function testDoesntSendWhenNoServer()
     {
-        $client = new Socket(
-            $ipc = $this->createMock(IPC::class),
+        $client = new IPC(
+            $ipc = $this->createMock(IPCInterface::class),
             $server = new Name('server')
         );
         $ipc
@@ -67,8 +67,8 @@ class SocketTest extends TestCase
             new Map('string', 'variable')
         );
 
-        $client = new Socket(
-            $ipc = $this->createMock(IPC::class),
+        $client = new IPC(
+            $ipc = $this->createMock(IPCInterface::class),
             $server
         );
         $ipc
@@ -95,8 +95,8 @@ class SocketTest extends TestCase
 
     public function testReturnEmptyStreamWhenNoServer()
     {
-        $client = new Socket(
-            $ipc = $this->createMock(IPC::class),
+        $client = new IPC(
+            $ipc = $this->createMock(IPCInterface::class),
             $server = new Name('server')
         );
         $ipc
@@ -124,8 +124,8 @@ class SocketTest extends TestCase
             new Map('string', 'variable')
         );
 
-        $client = new Socket(
-            $ipc = $this->createMock(IPC::class),
+        $client = new IPC(
+            $ipc = $this->createMock(IPCInterface::class),
             $server
         );
         $ipc
