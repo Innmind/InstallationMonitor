@@ -13,18 +13,15 @@ use Innmind\CLI\{
     Command\Options,
     Environment,
 };
-use Innmind\Socket\{
-    Address\Unix as Address,
-    Server\Unix,
-    Loop\Strategy,
+use Innmind\IPC\{
+    IPC,
+    Process\Name,
 };
-use Innmind\TimeContinuum\ElapsedPeriod;
 use Innmind\Server\Control\{
     Server,
     Server\Processes,
 };
 use Innmind\Url\Path;
-use Innmind\OperatingSystem\Sockets;
 use Innmind\Immutable\Map;
 use PHPUnit\Framework\TestCase;
 
@@ -36,9 +33,8 @@ class OverseeTest extends TestCase
             Command::class,
             new Oversee(
                 new Local(
-                    $this->createMock(Sockets::class),
-                    new Address('/tmp/foo'),
-                    new ElapsedPeriod(1000)
+                    $this->createMock(IPC::class),
+                    new Name('installation-monitor')
                 ),
                 $this->createMock(Server::class)
             )
@@ -59,9 +55,8 @@ USAGE;
             $usage,
             (string) new Oversee(
                 new Local(
-                    $this->createMock(Sockets::class),
-                    new Address('/tmp/foo'),
-                    new ElapsedPeriod(1000)
+                    $this->createMock(IPC::class),
+                    new Name('installation-monitor')
                 ),
                 $this->createMock(Server::class)
             )
@@ -72,22 +67,11 @@ USAGE;
     {
         $oversee = new Oversee(
             new Local(
-                $sockets = $this->createMock(Sockets::class),
-                $address = new Address('/tmp/foo'),
-                new ElapsedPeriod(1000),
-                new class implements Strategy {
-                    public function __invoke(): bool
-                    {
-                        return false;
-                    }
-                }
+                $this->createMock(IPC::class),
+                new Name('installation-monitor')
             ),
             $server = $this->createMock(Server::class)
         );
-        $sockets
-            ->expects($this->once())
-            ->method('takeOver')
-            ->willReturn(Unix::recoverable($address));
         $server
             ->expects($this->never())
             ->method('processes');
@@ -103,15 +87,8 @@ USAGE;
     {
         $oversee = new Oversee(
             new Local(
-                $this->createMock(Sockets::class),
-                new Address('/tmp/foo'),
-                new ElapsedPeriod(1000),
-                new class implements Strategy {
-                    public function __invoke(): bool
-                    {
-                        return false;
-                    }
-                }
+                $this->createMock(IPC::class),
+                new Name('installation-monitor')
             ),
             $server = $this->createMock(Server::class)
         );
