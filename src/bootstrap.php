@@ -3,33 +3,33 @@ declare(strict_types = 1);
 
 namespace Innmind\InstallationMonitor;
 
-use Innmind\Socket\Address\Unix as Address;
-use Innmind\Server\Control\Server as ServerControl;
-use Innmind\Server\Status\Server as ServerStatus;
-use Innmind\TimeContinuum\ElapsedPeriod;
+use Innmind\OperatingSystem\OperatingSystem;
 use Innmind\CLI\Commands;
+use Innmind\IPC\Process\Name;
+use function Innmind\IPC\bootstrap as ipc;
 
-function bootstrap(): array
+function bootstrap(OperatingSystem $os): array
 {
-    $localServerAddress = new Address('/tmp/installation-monitor');
+    $localServerName = new Name('installation-monitor');
+    $ipc = ipc($os);
 
     return [
-        'local_server_address' => $localServerAddress,
-        'commands' => static function(Address $address, ServerControl $control, ServerStatus $status): Commands {
+        'local_server_name' => $localServerName,
+        'commands' => static function() use ($ipc, $localServerName, $os): Commands {
             return new Commands(
                 new Command\Oversee(
                     new Server\Local(
-                        $address,
-                        new ElapsedPeriod(1000) // 1 second
+                        $ipc,
+                        $localServerName
                     ),
-                    $control
+                    $os->control()
                 ),
-                new Command\Kill($status, $control)
+                new Command\Kill($os->status(), $os->control())
             );
         },
         'client' => [
-            'socket' => static function(Address $address = null) use ($localServerAddress): Client {
-                return new Client\Socket($address ?? $localServerAddress);
+            'ipc' => static function() use ($ipc, $localServerName): Client {
+                return new Client\IPC($ipc, $localServerName);
             },
             'silence' => static function(Client $client): Client {
                 return new Client\Silence($client);

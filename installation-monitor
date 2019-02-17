@@ -25,24 +25,12 @@ use Innmind\CLI\{
     Main,
     Environment,
 };
-use Innmind\Socket\Address\Unix as Address;
-use Innmind\Server\Control\ServerFactory as ServerControlFactory;
-use Innmind\Server\Status\ServerFactory as ServerStatusFactory;
-use Innmind\TimeContinuum\{
-    TimeContinuum\Earth,
-    Timezone\Earth\UTC,
-};
+use Innmind\OperatingSystem\OperatingSystem;
 
 new class extends Main {
-    protected function main(Environment $env): void
+    protected function main(Environment $env, OperatingSystem $os): void
     {
-        $run = bootstrap()['commands'](
-            bootstrap()['local_server_address'],
-            ServerControlFactory::build(),
-            ServerStatusFactory::build(
-                new Earth(new UTC)
-            )
-        );
+        $run = bootstrap($os)['commands']();
         $run($env);
     }
 };

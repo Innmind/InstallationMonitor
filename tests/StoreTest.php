@@ -5,11 +5,18 @@ namespace Tests\Innmind\InstallationMonitor;
 
 use Innmind\InstallationMonitor\{
     Store,
-    IncomingConnection,
     Event,
     Event\Name,
 };
-use Innmind\Immutable\Map;
+use Innmind\IPC\{
+    Message\Generic as Message,
+    Sender,
+};
+use Innmind\Filesystem\MediaType\MediaType;
+use Innmind\Immutable\{
+    Map,
+    Str,
+};
 use PHPUnit\Framework\TestCase;
 
 class StoreTest extends TestCase
@@ -18,19 +25,28 @@ class StoreTest extends TestCase
     {
         $store = new Store;
 
-        $this->assertNull($store->remember($first = new Event(
+        $this->assertNull($store->remember(new Event(
             new Name('foo'),
             new Map('string', 'variable')
         )));
-        $this->assertNull($store->remember($second = new Event(
-            new Name('foo'),
+        $this->assertNull($store->remember(new Event(
+            new Name('bar'),
             new Map('string', 'variable')
         )));
-        $connection = $this->createMock(IncomingConnection::class);
-        $connection
+        $sender = $this->createMock(Sender::class);
+        $sender
             ->expects($this->once())
-            ->method('notify')
-            ->with($first, $second);
-        $this->assertNull($store->notify($connection));
+            ->method('__invoke')
+            ->with(
+                new Message(
+                    MediaType::fromString('application/json'),
+                    Str::of('{"name":"foo","payload":[]}')
+                ),
+                new Message(
+                    MediaType::fromString('application/json'),
+                    Str::of('{"name":"bar","payload":[]}')
+                )
+            );
+        $this->assertNull($store->notify($sender));
     }
 }

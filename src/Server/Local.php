@@ -4,59 +4,55 @@ declare(strict_types = 1);
 namespace Innmind\InstallationMonitor\Server;
 
 use Innmind\InstallationMonitor\{
-    Server\Local\Dispatch,
     Store,
+    Event,
+    IPC\Message\WaitingForEvents,
+    IPC\Message\EndOfTransmission,
+    Exception\DomainException,
 };
-use Innmind\Socket\{
-    Address\Unix as Address,
-    Server\Unix,
-    Loop,
-    Loop\Strategy,
-    Event\ConnectionReceived,
-    Event\ConnectionClosed,
-    Event\DataReceived,
+use Innmind\IPC\{
+    IPC,
+    Message,
+    Process\Name,
 };
-use Innmind\EventBus\EventBus;
-use Innmind\Immutable\{
-    SetInterface,
-    Set,
-    Map,
-};
-use Innmind\TimeContinuum\ElapsedPeriod;
 
 final class Local
 {
-    private $address;
-    private $timeout;
-    private $strategy;
-    private $dispatch;
+    private $ipc;
+    private $name;
+    private $store;
 
-    public function __construct(
-        Address $address,
-        ElapsedPeriod $timeout,
-        Strategy $strategy = null
-    ) {
-        $this->address = $address;
-        $this->timeout = $timeout;
-        $this->strategy = $strategy;
-        $this->dispatch = new Dispatch(new Store);
+    public function __construct(IPC $ipc, Name $name)
+    {
+        $this->ipc = $ipc;
+        $this->name = $name;
+        $this->store = new Store;
     }
 
     public function __invoke(): void
     {
-        $listeners = Set::of('callable', $this->dispatch);
+        $dispatch = $this->ipc->listen($this->name);
 
-        $server = Unix::recoverable($this->address);
-        $loop = new Loop(
-            new EventBus(
-                (new Map('string', SetInterface::class))
-                    ->put(ConnectionReceived::class, $listeners)
-                    ->put(DataReceived::class, $listeners)
-                    ->put(ConnectionClosed::class, $listeners)
-            ),
-            $this->timeout,
-            $this->strategy
-        );
-        $loop($server);
+        $dispatch(function(Message $message, Name $sender): void {
+            if ((new WaitingForEvents)->equals($message)) {
+                $this->sendEvents($sender);
+
+                return;
+            }
+
+            try {
+                $this->store->remember(Event::from($message));
+            } catch (DomainException $e) {
+                // never kill the server even when an invalid event is received
+            }
+        });
+    }
+
+    private function sendEvents(Name $sender): void
+    {
+        $this->ipc->wait($sender);
+        $send = $this->ipc->get($sender)->send($this->name);
+        $this->store->notify($send);
+        $send(new EndOfTransmission);
     }
 }

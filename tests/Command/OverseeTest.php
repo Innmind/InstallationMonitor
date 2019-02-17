@@ -13,11 +13,10 @@ use Innmind\CLI\{
     Command\Options,
     Environment,
 };
-use Innmind\Socket\{
-    Address\Unix as Address,
-    Loop\Strategy,
+use Innmind\IPC\{
+    IPC,
+    Process\Name,
 };
-use Innmind\TimeContinuum\ElapsedPeriod;
 use Innmind\Server\Control\{
     Server,
     Server\Processes,
@@ -34,8 +33,8 @@ class OverseeTest extends TestCase
             Command::class,
             new Oversee(
                 new Local(
-                    new Address('/tmp/foo'),
-                    new ElapsedPeriod(1000)
+                    $this->createMock(IPC::class),
+                    new Name('installation-monitor')
                 ),
                 $this->createMock(Server::class)
             )
@@ -56,8 +55,8 @@ USAGE;
             $usage,
             (string) new Oversee(
                 new Local(
-                    new Address('/tmp/foo'),
-                    new ElapsedPeriod(1000)
+                    $this->createMock(IPC::class),
+                    new Name('installation-monitor')
                 ),
                 $this->createMock(Server::class)
             )
@@ -68,14 +67,8 @@ USAGE;
     {
         $oversee = new Oversee(
             new Local(
-                new Address('/tmp/foo'),
-                new ElapsedPeriod(1000),
-                new class implements Strategy {
-                    public function __invoke(): bool
-                    {
-                        return false;
-                    }
-                }
+                $this->createMock(IPC::class),
+                new Name('installation-monitor')
             ),
             $server = $this->createMock(Server::class)
         );
@@ -94,14 +87,8 @@ USAGE;
     {
         $oversee = new Oversee(
             new Local(
-                new Address('/tmp/foo'),
-                new ElapsedPeriod(1000),
-                new class implements Strategy {
-                    public function __invoke(): bool
-                    {
-                        return false;
-                    }
-                }
+                $this->createMock(IPC::class),
+                new Name('installation-monitor')
             ),
             $server = $this->createMock(Server::class)
         );

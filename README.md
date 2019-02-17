@@ -1,10 +1,10 @@
 # Installation Monitor
 
-| `master` | `develop` |
-|----------|-----------|
-| [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/?branch=master) | [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/?branch=develop) |
-| [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/?branch=master) | [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/?branch=develop) |
-| [![Build Status](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/build-status/master) | [![Build Status](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/build-status/develop) |
+| `develop` |
+|-----------|
+| [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/?branch=develop) |
+| [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/?branch=develop) |
+| [![Build Status](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/build-status/develop) |
 
 Tool to listen and redispatch events from/to other applications.
 
@@ -29,12 +29,9 @@ Then from your application you can send an event like so :
 ```php
 use function Innmind\InstallationMonitor\bootstrap;
 use Innmind\InstallationMonitor\Event;
-use Innmind\Socket\Address\Unix as Address;
 use Innmind\Immutable\Map;
 
-$client = bootstrap()['client']['socket'](
-    new Address('/tmp/installation-monitor')
-);
+$client = bootstrap()['client']['ipc']();
 $client->send(
     new Event(
         new Event\Name('foo'),

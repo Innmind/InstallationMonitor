@@ -5,11 +5,9 @@ namespace Tests\Innmind\InstallationMonitor\Client;
 
 use Innmind\InstallationMonitor\{
     Client\Silence,
-    Client\Socket,
     Client,
     Event,
 };
-use Innmind\Socket\Address\Unix as Address;
 use Innmind\Immutable\{
     Map,
     Stream,
@@ -45,7 +43,13 @@ class SilenceTest extends TestCase
 
     public function testSilenceFailedSend()
     {
-        $client = new Silence(new Socket(new Address('/tmp/unknown')));
+        $client = new Silence(
+            $inner = $this->createMock(Client::class)
+        );
+        $inner
+            ->expects($this->once())
+            ->method('send')
+            ->will($this->throwException(new \RuntimeException));
 
         $this->assertNull($client->send(new Event(
             new Event\Name('foo'),
@@ -72,7 +76,13 @@ class SilenceTest extends TestCase
 
     public function testSilenceFailedEventsRetrieval()
     {
-        $client = new Silence(new Socket(new Address('/tmp/unknown')));
+        $client = new Silence(
+            $inner = $this->createMock(Client::class)
+        );
+        $inner
+            ->expects($this->once())
+            ->method('events')
+            ->will($this->throwException(new \RuntimeException));
 
         $events = $client->events();
 
