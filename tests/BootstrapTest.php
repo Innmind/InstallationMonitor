@@ -9,11 +9,7 @@ use Innmind\InstallationMonitor\{
     Client\Silence,
     Client,
 };
-use Innmind\Socket\Address\Unix as Address;
-use Innmind\OperatingSystem\{
-    OperatingSystem,
-    Sockets,
-};
+use Innmind\OperatingSystem\OperatingSystem;
 use Innmind\CLI\Commands;
 use PHPUnit\Framework\TestCase;
 
@@ -21,17 +17,11 @@ class BootstrapTest extends TestCase
 {
     public function testBootstrap()
     {
-        $services = bootstrap();
+        $services = bootstrap($this->createMock(OperatingSystem::class));
 
         $this->assertCount(2, $services['client']);
         $this->assertInternalType('callable', $services['client']['socket']);
-        $this->assertInstanceOf(Socket::class, $services['client']['socket'](
-            $this->createMock(Sockets::class),
-            new Address('/tmp/foo')
-        ));
-        $this->assertInstanceOf(Socket::class, $services['client']['socket'](
-            $this->createMock(Sockets::class)
-        ));
+        $this->assertInstanceOf(Socket::class, $services['client']['socket']());
         $this->assertInternalType('callable', $services['client']['silence']);
         $this->assertInstanceOf(Silence::class, $services['client']['silence'](
             $this->createMock(Client::class)
@@ -39,10 +29,7 @@ class BootstrapTest extends TestCase
         $this->assertInternalType('callable', $services['commands']);
         $this->assertInstanceOf(
             Commands::class,
-            $services['commands'](
-                new Address('/tmp/foo'),
-                $this->createMock(OperatingSystem::class)
-            )
+            $services['commands']()
         );
     }
 }

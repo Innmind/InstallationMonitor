@@ -3,7 +3,14 @@ declare(strict_types = 1);
 
 namespace Innmind\InstallationMonitor;
 
-use Innmind\Immutable\Stream;
+use Innmind\IPC\{
+    Sender,
+    Message,
+};
+use Innmind\Immutable\{
+    StreamInterface,
+    Stream,
+};
 
 final class Store
 {
@@ -19,8 +26,17 @@ final class Store
         $this->events = $this->events->add($event);
     }
 
-    public function notify(IncomingConnection $connection): void
+    public function notify(Sender $send): void
     {
-        $connection->notify(...$this->events);
+        $send(
+            ...$this
+                ->events
+                ->reduce(
+                    Stream::of(Message::class),
+                    static function(StreamInterface $messages, Event $event): StreamInterface {
+                        return $messages->add($event->toMessage());
+                    }
+                )
+        );
     }
 }

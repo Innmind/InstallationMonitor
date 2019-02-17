@@ -6,42 +6,49 @@ namespace Innmind\InstallationMonitor\Client;
 use Innmind\InstallationMonitor\{
     Client,
     Event,
-    Events,
+    IPC\Message\WaitingForEvents,
+    IPC\Message\EndOfTransmission,
 };
-use Innmind\Socket\Address\Unix;
-use Innmind\Stream\Select;
-use Innmind\TimeContinuum\ElapsedPeriod;
-use Innmind\OperatingSystem\Sockets;
+use Innmind\IPC\{
+    IPC,
+    Process\Name,
+    Message,
+    Exception\Stop,
+};
 use Innmind\Immutable\{
     StreamInterface,
     Stream,
-    Str,
 };
+use Ramsey\Uuid\Uuid;
 
 final class Socket implements Client
 {
-    private $sockets;
-    private $address;
+    private $ipc;
+    private $server;
 
-    public function __construct(Sockets $sockets, Unix $address)
+    public function __construct(IPC $ipc, Name $server)
     {
-        $this->sockets = $sockets;
-        $this->address = $address;
+        $this->ipc = $ipc;
+        $this->server = $server;
     }
 
     public function send(Event ...$events): void
     {
-        $events = new Events(...$events);
-
-        if ($events->count() === 0) {
+        if (!$this->ipc->exist($this->server)) {
             return;
         }
 
-        $socket = $this->sockets->connectTo($this->address);
+        $messages = [];
 
-        $socket->write($events->toString());
+        foreach ($events as $event) {
+            $messages[] = $event->toMessage();
+        }
 
-        $socket->close();
+        $name = new Name((string) Uuid::uuid4());
+        $this
+            ->ipc
+            ->get($this->server)
+            ->send($name)(...$messages);
     }
 
     /**
@@ -49,26 +56,24 @@ final class Socket implements Client
      */
     public function events(): StreamInterface
     {
-        $socket = $this->sockets->connectTo($this->address);
+        if (!$this->ipc->exist($this->server)) {
+            return Stream::of(Event::class);
+        }
 
-        $select = new Select(new ElapsedPeriod(1000)); // 1 second timeout
-        $select = $select->forRead($socket);
+        $name = new Name((string) Uuid::uuid4());
+        $this->ipc->get($this->server)->send($name)(new WaitingForEvents);
 
-        $events = Str::of('', 'ASCII');
-        $timedOutIterations = 0;
+        $events = [];
+        $this
+            ->ipc
+            ->listen($name)(static function(Message $message) use (&$events): void {
+                if ((new EndOfTransmission)->equals($message)) {
+                    throw new Stop;
+                }
 
-        do {
-            $sockets = $select();
+                $events[] = Event::from($message);
+            });
 
-            if ($sockets->get('read')->contains($socket)) {
-                $events = $events->append($socket->read());
-            } else {
-                ++$timedOutIterations;
-            }
-        } while ($timedOutIterations < 2);
-
-        $socket->close();
-
-        return Stream::of(Event::class, ...Events::from($events));
+        return Stream::of(Event::class, ...$events);
     }
 }

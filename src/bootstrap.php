@@ -3,27 +3,27 @@ declare(strict_types = 1);
 
 namespace Innmind\InstallationMonitor;
 
-use Innmind\Socket\Address\Unix as Address;
-use Innmind\OperatingSystem\{
-    OperatingSystem,
-    Sockets,
-};
-use Innmind\TimeContinuum\ElapsedPeriod;
+use Innmind\OperatingSystem\OperatingSystem;
 use Innmind\CLI\Commands;
+use Innmind\IPC\{
+    IPC,
+    Process\Name,
+};
+use function Innmind\IPC\bootstrap as ipc;
 
-function bootstrap(): array
+function bootstrap(OperatingSystem $os): array
 {
-    $localServerAddress = new Address('/tmp/installation-monitor');
+    $localServerName = new Name('installation-monitor');
+    $ipc = ipc($os);
 
     return [
-        'local_server_address' => $localServerAddress,
-        'commands' => static function(Address $address, OperatingSystem $os): Commands {
+        'local_server_name' => $localServerName,
+        'commands' => static function() use ($ipc, $localServerName, $os): Commands {
             return new Commands(
                 new Command\Oversee(
                     new Server\Local(
-                        $os->sockets(),
-                        $address,
-                        new ElapsedPeriod(1000) // 1 second
+                        $ipc,
+                        $localServerName
                     ),
                     $os->control()
                 ),
@@ -31,8 +31,8 @@ function bootstrap(): array
             );
         },
         'client' => [
-            'socket' => static function(Sockets $sockets, Address $address = null) use ($localServerAddress): Client {
-                return new Client\Socket($sockets, $address ?? $localServerAddress);
+            'socket' => static function() use ($ipc, $localServerName): Client {
+                return new Client\Socket($ipc, $localServerName);
             },
             'silence' => static function(Client $client): Client {
                 return new Client\Silence($client);

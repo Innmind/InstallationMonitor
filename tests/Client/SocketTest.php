@@ -7,13 +7,17 @@ use Innmind\InstallationMonitor\{
     Client\Socket,
     Client,
     Event,
+    IPC\Message\WaitingForEvents,
+    IPC\Message\EndOfTransmission,
 };
-use Innmind\Socket\{
-    Address\Unix as Address,
-    Server\Unix as Server,
-    Client\Unix as UnixClient,
+use Innmind\IPC\{
+    IPC,
+    Process,
+    Process\Name,
+    Sender,
+    Receiver,
+    Exception\Stop,
 };
-use Innmind\OperatingSystem\Sockets;
 use Innmind\Immutable\{
     Map,
     StreamInterface,
@@ -27,67 +31,146 @@ class SocketTest extends TestCase
         $this->assertInstanceOf(
             Client::class,
             new Socket(
-                $this->createMock(Sockets::class),
-                new Address('/tmp/foo')
+                $this->createMock(IPC::class),
+                new Name('foo')
             )
         );
+    }
+
+    public function testDoesntSendWhenNoServer()
+    {
+        $client = new Socket(
+            $ipc = $this->createMock(IPC::class),
+            $server = new Name('server')
+        );
+        $ipc
+            ->expects($this->once())
+            ->method('exist')
+            ->with($server)
+            ->willReturn(false);
+
+        $this->assertNull($client->send(new Event(
+            new Event\Name('foo'),
+            new Map('string', 'variable')
+        )));
     }
 
     public function testSend()
     {
-        $address = new Address('/tmp/foo');
-        $server = Server::recoverable($address);
+        $server = new Name('foo');
+        $event1 = new Event(
+            new Event\Name('foo'),
+            new Map('string', 'variable')
+        );
+        $event2 = new Event(
+            new Event\Name('bar'),
+            new Map('string', 'variable')
+        );
 
         $client = new Socket(
-            $sockets = $this->createMock(Sockets::class),
-            $address
+            $ipc = $this->createMock(IPC::class),
+            $server
         );
-        $sockets
+        $ipc
+            ->expects($this->at(0))
+            ->method('exist')
+            ->with($server)
+            ->willReturn(true);
+        $ipc
+            ->expects($this->at(1))
+            ->method('get')
+            ->with($server)
+            ->willReturn($process = $this->createMock(Process::class));
+        $process
             ->expects($this->once())
-            ->method('connectTo')
-            ->with($address)
-            ->willReturn(new UnixClient($address));
+            ->method('send')
+            ->willReturn($sender = $this->createMock(Sender::class));
+        $sender
+            ->expects($this->once())
+            ->method('__invoke')
+            ->with($event1->toMessage(), $event2->toMessage());
 
-        $this->assertNull($client->send(
-            new Event(
-                new Event\Name('foo'),
-                new Map('string', 'variable')
-            ),
-            new Event(
-                new Event\Name('bar'),
-                new Map('string', 'variable')
-            )
-        ));
+        $this->assertNull($client->send($event1, $event2));
+    }
 
-        $connection = $server->accept();
-        $this->assertSame(
-            '{"name":"foo","payload":[]}ø{"name":"bar","payload":[]}',
-            (string) $connection->read()
+    public function testReturnEmptyStreamWhenNoServer()
+    {
+        $client = new Socket(
+            $ipc = $this->createMock(IPC::class),
+            $server = new Name('server')
         );
+        $ipc
+            ->expects($this->once())
+            ->method('exist')
+            ->with($server)
+            ->willReturn(false);
+
+        $events = $client->events();
+
+        $this->assertInstanceOf(StreamInterface::class, $events);
+        $this->assertSame(Event::class, (string) $events->type());
+        $this->assertCount(0, $events);
     }
 
     public function testEvents()
     {
-        $address = new Address('/tmp/foo');
-        $server = Server::recoverable($address);
+        $server = new Name('server');
+        $event1 = new Event(
+            new Event\Name('foo'),
+            new Map('string', 'variable')
+        );
+        $event2 = new Event(
+            new Event\Name('bar'),
+            new Map('string', 'variable')
+        );
 
         $client = new Socket(
-            $sockets = $this->createMock(Sockets::class),
-            $address
+            $ipc = $this->createMock(IPC::class),
+            $server
         );
-        $sockets
+        $ipc
+            ->expects($this->at(0))
+            ->method('exist')
+            ->with($server)
+            ->willReturn(true);
+        $ipc
+            ->expects($this->at(1))
+            ->method('get')
+            ->with($server)
+            ->willReturn($process = $this->createMock(Process::class));
+        $process
             ->expects($this->once())
-            ->method('connectTo')
-            ->with($address)
-            ->willReturn(new UnixClient($address));
+            ->method('send')
+            ->willReturn($sender = $this->createMock(Sender::class));
+        $sender
+            ->expects($this->once())
+            ->method('__invoke')
+            ->with(new WaitingForEvents);
+        $ipc
+            ->expects($this->at(2))
+            ->method('listen')
+            ->willReturn($receiver = $this->createMock(Receiver::class));
+        $receiver
+            ->expects($this->once())
+            ->method('__invoke')
+            ->with($this->callback(static function($listen) use ($event1, $event2): bool {
+                $listen($event1->toMessage());
+                $listen($event2->toMessage());
 
-        $start = microtime(true);
+                try {
+                    $listen(new EndOfTransmission);
+
+                    return false;
+                } catch (Stop $e) {
+                    return true;
+                }
+            }));
+
         $events = $client->events();
-        $end = microtime(true);
 
         $this->assertInstanceOf(StreamInterface::class, $events);
         $this->assertSame(Event::class, (string) $events->type());
-        $this->assertCount(0, $events); // empty as from here we can't push events to the server
-        $this->assertEquals(2, $end - $start, '', 0.02);
+        $this->assertCount(2, $events);
+        $this->assertEquals([$event1, $event2], $events->toPrimitive());
     }
 }

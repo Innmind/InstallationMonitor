@@ -25,16 +25,12 @@ use Innmind\CLI\{
     Main,
     Environment,
 };
-use Innmind\Socket\Address\Unix as Address;
 use Innmind\OperatingSystem\OperatingSystem;
 
 new class extends Main {
     protected function main(Environment $env, OperatingSystem $os): void
     {
-        $run = bootstrap()['commands'](
-            bootstrap()['local_server_address'],
-            $os
-        );
+        $run = bootstrap($os)['commands']();
         $run($env);
     }
 };
