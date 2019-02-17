@@ -29,12 +29,9 @@ Then from your application you can send an event like so :
 ```php
 use function Innmind\InstallationMonitor\bootstrap;
 use Innmind\InstallationMonitor\Event;
-use Innmind\Socket\Address\Unix as Address;
 use Innmind\Immutable\Map;
 
-$client = bootstrap()['client']['socket'](
-    new Address('/tmp/installation-monitor')
-);
+$client = bootstrap()['client']['ipc']();
 $client->send(
     new Event(
         new Event\Name('foo'),
