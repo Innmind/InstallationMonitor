@@ -7,19 +7,17 @@ use Innmind\InstallationMonitor\{
     Client,
     Event,
     IPC\Message\WaitingForEvents,
-    IPC\Message\EndOfTransmission,
 };
 use Innmind\IPC\{
     IPC as IPCInterface,
     Process\Name,
     Message,
-    Exception\Stop,
+    Exception\ConnectionClosed,
 };
 use Innmind\Immutable\{
     StreamInterface,
     Stream,
 };
-use Ramsey\Uuid\Uuid;
 
 final class IPC implements Client
 {
@@ -44,11 +42,9 @@ final class IPC implements Client
             $messages[] = $event->toMessage();
         }
 
-        $name = new Name((string) Uuid::uuid4());
-        $this
-            ->ipc
-            ->get($this->server)
-            ->send($name)(...$messages);
+        $process = $this->ipc->get($this->server);
+        $process->send(...$messages);
+        $process->close();
     }
 
     /**
@@ -60,19 +56,18 @@ final class IPC implements Client
             return Stream::of(Event::class);
         }
 
-        $name = new Name((string) Uuid::uuid4());
-        $this->ipc->get($this->server)->send($name)(new WaitingForEvents);
+        $process = $this->ipc->get($this->server);
+        $process->send(new WaitingForEvents);
 
         $events = [];
-        $this
-            ->ipc
-            ->listen($name)(static function(Message $message) use (&$events): void {
-                if ((new EndOfTransmission)->equals($message)) {
-                    throw new Stop;
-                }
 
-                $events[] = Event::from($message);
-            });
+        try {
+            while (true) {
+                $events[] = Event::from($process->wait());
+            }
+        } catch (ConnectionClosed $e) {
+            // end of transmission
+        }
 
         return Stream::of(Event::class, ...$events);
     }

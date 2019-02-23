@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\InstallationMonitor;
 
 use Innmind\IPC\{
-    Sender,
+    Client,
     Message,
 };
 use Innmind\Immutable\{
@@ -26,9 +26,9 @@ final class Store
         $this->events = $this->events->add($event);
     }
 
-    public function notify(Sender $send): void
+    public function notify(Client $client): void
     {
-        $send(
+        $client->send(
             ...$this
                 ->events
                 ->reduce(

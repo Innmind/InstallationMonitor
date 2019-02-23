@@ -13,6 +13,7 @@ use Innmind\InstallationMonitor\{
 use Innmind\IPC\{
     IPC,
     Message,
+    Client,
     Process\Name,
 };
 
@@ -33,9 +34,9 @@ final class Local
     {
         $dispatch = $this->ipc->listen($this->name);
 
-        $dispatch(function(Message $message, Name $sender): void {
-            if ((new WaitingForEvents)->equals($message)) {
-                $this->sendEvents($sender);
+        $dispatch(function(Message $message, Client $client): void {
+            if ($message->equals(new WaitingForEvents)) {
+                $this->sendEvents($client);
 
                 return;
             }
@@ -48,11 +49,9 @@ final class Local
         });
     }
 
-    private function sendEvents(Name $sender): void
+    private function sendEvents(Client $client): void
     {
-        $this->ipc->wait($sender);
-        $send = $this->ipc->get($sender)->send($this->name);
-        $this->store->notify($send);
-        $send(new EndOfTransmission);
+        $this->store->notify($client);
+        $client->close();
     }
 }
