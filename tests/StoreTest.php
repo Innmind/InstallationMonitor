@@ -35,18 +35,19 @@ class StoreTest extends TestCase
         )));
         $client = $this->createMock(Client::class);
         $client
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('send')
-            ->with(
-                new Message(
-                    MediaType::fromString('application/json'),
-                    Str::of('{"name":"foo","payload":[]}')
-                ),
-                new Message(
-                    MediaType::fromString('application/json'),
-                    Str::of('{"name":"bar","payload":[]}')
-                )
-            );
+            ->with(new Message(
+                MediaType::fromString('application/json'),
+                Str::of('{"name":"foo","payload":[]}')
+            ));
+        $client
+            ->expects($this->at(1))
+            ->method('send')
+            ->with(new Message(
+                MediaType::fromString('application/json'),
+                Str::of('{"name":"bar","payload":[]}')
+            ));
         $this->assertNull($store->notify($client));
     }
 }

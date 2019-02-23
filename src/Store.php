@@ -28,15 +28,13 @@ final class Store
 
     public function notify(Client $client): void
     {
-        $client->send(
-            ...$this
-                ->events
-                ->reduce(
-                    Stream::of(Message::class),
-                    static function(StreamInterface $messages, Event $event): StreamInterface {
-                        return $messages->add($event->toMessage());
-                    }
-                )
+        $this->events->reduce(
+            $client,
+            static function(Client $client, Event $event): Client {
+                $client->send($event->toMessage());
+
+                return $client;
+            }
         );
     }
 }
