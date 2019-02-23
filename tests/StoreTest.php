@@ -10,7 +10,7 @@ use Innmind\InstallationMonitor\{
 };
 use Innmind\IPC\{
     Message\Generic as Message,
-    Sender,
+    Client,
 };
 use Innmind\Filesystem\MediaType\MediaType;
 use Innmind\Immutable\{
@@ -33,20 +33,21 @@ class StoreTest extends TestCase
             new Name('bar'),
             new Map('string', 'variable')
         )));
-        $sender = $this->createMock(Sender::class);
-        $sender
-            ->expects($this->once())
-            ->method('__invoke')
-            ->with(
-                new Message(
-                    MediaType::fromString('application/json'),
-                    Str::of('{"name":"foo","payload":[]}')
-                ),
-                new Message(
-                    MediaType::fromString('application/json'),
-                    Str::of('{"name":"bar","payload":[]}')
-                )
-            );
-        $this->assertNull($store->notify($sender));
+        $client = $this->createMock(Client::class);
+        $client
+            ->expects($this->at(0))
+            ->method('send')
+            ->with(new Message(
+                MediaType::fromString('application/json'),
+                Str::of('{"name":"foo","payload":[]}')
+            ));
+        $client
+            ->expects($this->at(1))
+            ->method('send')
+            ->with(new Message(
+                MediaType::fromString('application/json'),
+                Str::of('{"name":"bar","payload":[]}')
+            ));
+        $this->assertNull($store->notify($client));
     }
 }

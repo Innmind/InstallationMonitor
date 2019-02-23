@@ -14,9 +14,7 @@ use Innmind\IPC\{
     IPC as IPCInterface,
     Process,
     Process\Name,
-    Sender,
-    Receiver,
-    Exception\Stop,
+    Exception\ConnectionClosed,
 };
 use Innmind\Immutable\{
     Map,
@@ -82,13 +80,12 @@ class IPCTest extends TestCase
             ->with($server)
             ->willReturn($process = $this->createMock(Process::class));
         $process
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('send')
-            ->willReturn($sender = $this->createMock(Sender::class));
-        $sender
-            ->expects($this->once())
-            ->method('__invoke')
             ->with($event1->toMessage(), $event2->toMessage());
+        $process
+            ->expects($this->at(1))
+            ->method('close');
 
         $this->assertNull($client->send($event1, $event2));
     }
@@ -139,32 +136,21 @@ class IPCTest extends TestCase
             ->with($server)
             ->willReturn($process = $this->createMock(Process::class));
         $process
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('send')
-            ->willReturn($sender = $this->createMock(Sender::class));
-        $sender
-            ->expects($this->once())
-            ->method('__invoke')
             ->with(new WaitingForEvents);
-        $ipc
+        $process
+            ->expects($this->at(1))
+            ->method('wait')
+            ->willReturn($event1->toMessage());
+        $process
             ->expects($this->at(2))
-            ->method('listen')
-            ->willReturn($receiver = $this->createMock(Receiver::class));
-        $receiver
-            ->expects($this->once())
-            ->method('__invoke')
-            ->with($this->callback(static function($listen) use ($event1, $event2): bool {
-                $listen($event1->toMessage());
-                $listen($event2->toMessage());
-
-                try {
-                    $listen(new EndOfTransmission);
-
-                    return false;
-                } catch (Stop $e) {
-                    return true;
-                }
-            }));
+            ->method('wait')
+            ->willReturn($event2->toMessage());
+        $process
+            ->expects($this->at(3))
+            ->method('wait')
+            ->will($this->throwException(new ConnectionClosed));
 
         $events = $client->events();
 
