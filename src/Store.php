@@ -3,14 +3,8 @@ declare(strict_types = 1);
 
 namespace Innmind\InstallationMonitor;
 
-use Innmind\IPC\{
-    Client,
-    Message,
-};
-use Innmind\Immutable\{
-    StreamInterface,
-    Stream,
-};
+use Innmind\IPC\Client;
+use Innmind\Immutable\Stream;
 
 final class Store
 {
