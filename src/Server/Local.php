@@ -7,7 +7,6 @@ use Innmind\InstallationMonitor\{
     Store,
     Event,
     IPC\Message\WaitingForEvents,
-    IPC\Message\EndOfTransmission,
     Exception\DomainException,
 };
 use Innmind\IPC\{
