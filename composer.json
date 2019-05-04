@@ -43,5 +43,11 @@
     "scripts": {
         "test": "vendor/bin/phpunit --colors=always"
     },
-    "bin": ["installation-monitor"]
+    "bin": ["installation-monitor"],
+    "extra": {
+        "gene": {
+            "expression": ["installation-monitor oversee --daemon"],
+            "suppression": ["installation-monitor kill"]
+        }
+    }
 }
