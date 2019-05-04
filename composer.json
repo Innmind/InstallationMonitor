@@ -22,7 +22,8 @@
         "innmind/server-control": "^2.5",
         "innmind/server-status": "^1.1",
         "innmind/operating-system": "^1.0",
-        "innmind/ipc": "^2.0"
+        "innmind/ipc": "^2.0",
+        "innmind/silent-cartographer": "^1.1"
     },
     "autoload": {
         "psr-4": {
@@ -43,5 +44,11 @@
     "scripts": {
         "test": "vendor/bin/phpunit --colors=always"
     },
-    "bin": ["installation-monitor"]
+    "bin": ["installation-monitor"],
+    "extra": {
+        "gene": {
+            "expression": ["installation-monitor oversee --daemon"],
+            "suppression": ["installation-monitor kill"]
+        }
+    }
 }
