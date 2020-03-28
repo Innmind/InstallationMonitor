@@ -41,9 +41,6 @@
         "phpunit/phpunit": "~8.0",
         "giorgiosironi/eris": "^0.10.0"
     },
-    "scripts": {
-        "test": "vendor/bin/phpunit --colors=always"
-    },
     "bin": ["installation-monitor"],
     "extra": {
         "gene": {
