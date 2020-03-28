@@ -20,11 +20,11 @@ function bootstrap(OperatingSystem $os): array
                 new Command\Oversee(
                     new Server\Local(
                         $ipc,
-                        $localServerName
+                        $localServerName,
                     ),
-                    $os->control()
+                    $os->control(),
                 ),
-                new Command\Kill($os->status(), $os->control())
+                new Command\Kill($os->status(), $os->control()),
             );
         },
         'client' => [

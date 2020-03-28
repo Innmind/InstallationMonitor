@@ -15,7 +15,7 @@ use Innmind\IPC\{
     Server,
     Client,
 };
-use Innmind\Filesystem\MediaType\MediaType;
+use Innmind\MediaType\MediaType;
 use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -29,11 +29,11 @@ class LocalTest extends TestCase
         );
         $sender = $this->createMock(Client::class);
         $event = new Message(
-            MediaType::fromString('application/json'),
+            MediaType::of('application/json'),
             Str::of('{"name":"foo","payload":[]}')
         );
         $invalidEvent = new Message(
-            MediaType::fromString('text/plain'),
+            MediaType::of('text/plain'),
             Str::of('{"name":"foo","payload":[]}')
         );
         $waitingForEvents = new WaitingForEvents;

@@ -4,31 +4,26 @@ declare(strict_types = 1);
 namespace Innmind\InstallationMonitor;
 
 use Innmind\IPC\Client;
-use Innmind\Immutable\Stream;
+use Innmind\Immutable\Sequence;
 
 final class Store
 {
-    private $events;
+    private Sequence $events;
 
     public function __construct()
     {
-        $this->events = Stream::of(Event::class);
+        $this->events = Sequence::of(Event::class);
     }
 
     public function remember(Event $event): void
     {
-        $this->events = $this->events->add($event);
+        $this->events = ($this->events)($event);
     }
 
     public function notify(Client $client): void
     {
-        $this->events->reduce(
-            $client,
-            static function(Client $client, Event $event): Client {
-                $client->send($event->toMessage());
-
-                return $client;
-            }
+        $this->events->foreach(
+            static fn(Event $event) => $client->send($event->toMessage()),
         );
     }
 }

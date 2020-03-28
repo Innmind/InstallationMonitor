@@ -16,7 +16,7 @@ use Innmind\Server\Status\{
 use Innmind\Server\Control\{
     Server as ServerControl,
 };
-use Innmind\TimeContinuum\PointInTimeInterface;
+use Innmind\TimeContinuum\PointInTime;
 use Innmind\Immutable\Map;
 use PHPUnit\Framework\TestCase;
 
@@ -43,10 +43,10 @@ USAGE;
 
         $this->assertSame(
             $usage,
-            (string) new Kill(
+            (new Kill(
                 $this->createMock(ServerStatus::class),
                 $this->createMock(ServerControl::class)
-            )
+            ))->toString()
         );
     }
 
@@ -64,37 +64,37 @@ USAGE;
             ->expects($this->once())
             ->method('all')
             ->willReturn(
-                (new Map('int', ServerStatus\Process::class))
-                    ->put(
+                Map::of('int', ServerStatus\Process::class)
+                    (
                         2,
                         new ServerStatus\Process(
                             new ServerStatus\Process\Pid(2),
                             new ServerStatus\Process\User('root'),
                             new ServerStatus\Cpu\Percentage(0.0),
                             new ServerStatus\Process\Memory(0.0),
-                            $this->createMock(PointInTimeInterface::class),
+                            $this->createMock(PointInTime::class),
                             new ServerStatus\Process\Command('php /root/.composer/vendor/bin/installation-monitor oversee')
                         )
                     )
-                    ->put(
+                    (
                         3,
                         new ServerStatus\Process(
                             new ServerStatus\Process\Pid(3),
                             new ServerStatus\Process\User('root'),
                             new ServerStatus\Cpu\Percentage(0.0),
                             new ServerStatus\Process\Memory(0.0),
-                            $this->createMock(PointInTimeInterface::class),
+                            $this->createMock(PointInTime::class),
                             new ServerStatus\Process\Command('grep installation-monitor')
                         )
                     )
-                    ->put(
+                    (
                         4,
                         new ServerStatus\Process(
                             new ServerStatus\Process\Pid(4),
                             new ServerStatus\Process\User('root'),
                             new ServerStatus\Cpu\Percentage(0.0),
                             new ServerStatus\Process\Memory(0.0),
-                            $this->createMock(PointInTimeInterface::class),
+                            $this->createMock(PointInTime::class),
                             new ServerStatus\Process\Command('php /root/.composer/vendor/bin/installation-monitor oversee')
                         )
                     )

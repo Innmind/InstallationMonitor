@@ -30,14 +30,14 @@ class FunctionalTest extends TestCase
         $client = bootstrap($os)['client']['ipc']();
         $event = new Event(
             new Event\Name('test'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
                 ('foo', 42)
         );
         $client->send($event);
         $events = $client->events();
 
         $this->assertCount(1, $events);
-        $this->assertEquals($event, $events->current());
+        $this->assertEquals($event, $events->first());
 
         $os->control()->processes()->kill(
             $server->pid(),

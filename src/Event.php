@@ -8,27 +8,26 @@ use Innmind\InstallationMonitor\{
     Exception\DomainException,
 };
 use Innmind\IPC\Message;
-use Innmind\Filesystem\MediaType\MediaType;
+use Innmind\MediaType\MediaType;
 use Innmind\Json\Json;
 use Innmind\Immutable\{
-    MapInterface,
     Map,
     Str,
 };
+use function Innmind\Immutable\assertMap;
 
 final class Event
 {
-    private $name;
-    private $payload;
+    private Name $name;
+    /** @var Map<string, scalar|array> */
+    private Map $payload;
 
-    public function __construct(Name $name, MapInterface $payload)
+    /**
+     * @param Map<string, scalar|array> $payload
+     */
+    public function __construct(Name $name, Map $payload)
     {
-        if (
-            (string) $payload->keyType() !== 'string' ||
-            (string) $payload->valueType() !== 'variable'
-        ) {
-            throw new \TypeError('Argument 2 must be of type MapInterface<string, variable>');
-        }
+        assertMap('string', 'scalar|array', $payload, 2);
 
         $this->name = $name;
         $this->payload = $payload;
@@ -40,27 +39,31 @@ final class Event
             $message->mediaType()->topLevel() !== 'application' ||
             $message->mediaType()->subType() !== 'json'
         ) {
-            throw new DomainException((string) $message->content());
+            throw new DomainException($message->content()->toString());
         }
 
-        $data = Json::decode((string) $message->content());
+        /** @var array{name: string, payload: array<string, scalar|array>} */
+        $data = Json::decode($message->content()->toString());
 
+        /** @psalm-suppress DocblockTypeContradiction */
         if (
             !isset($data['name']) ||
             !isset($data['payload']) ||
             !\is_array($data['payload'])
         ) {
-            throw new DomainException((string) $message->content());
+            throw new DomainException($message->content()->toString());
+        }
+
+        /** @var Map<string, scalar|array> */
+        $payload = Map::of('string', 'scalar|array');
+
+        foreach ($data['payload'] as $key => $value) {
+            $payload = ($payload)($key, $value);
         }
 
         return new self(
             new Name($data['name']),
-            Map::of(
-                'string',
-                'variable',
-                \array_keys($data['payload']),
-                \array_values($data['payload'])
-            )
+            $payload,
         );
     }
 
@@ -70,16 +73,16 @@ final class Event
     }
 
     /**
-     * @return MapInterface<string, variable>
+     * @return Map<string, scalar|array>
      */
-    public function payload(): MapInterface
+    public function payload(): Map
     {
         return $this->payload;
     }
 
     public function toMessage(): Message
     {
-        $content = new Str(Json::encode([
+        $content = Str::of(Json::encode([
             'name' => (string) $this->name(),
             'payload' => $this->payload()->reduce(
                 [],
@@ -87,13 +90,13 @@ final class Event
                     $carry[$key] = $value;
 
                     return $carry;
-                }
+                },
             ),
         ]));
 
         return new Message\Generic(
-            MediaType::fromString('application/json'),
-            $content
+            MediaType::of('application/json'),
+            $content,
         );
     }
 }

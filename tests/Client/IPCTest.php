@@ -18,8 +18,9 @@ use Innmind\IPC\{
 };
 use Innmind\Immutable\{
     Map,
-    StreamInterface,
+    Sequence,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class IPCTest extends TestCase
@@ -49,7 +50,7 @@ class IPCTest extends TestCase
 
         $this->assertNull($client->send(new Event(
             new Event\Name('foo'),
-            new Map('string', 'variable')
+            Map::of('string', 'scalar|array')
         )));
     }
 
@@ -58,11 +59,11 @@ class IPCTest extends TestCase
         $server = new Name('foo');
         $event1 = new Event(
             new Event\Name('foo'),
-            new Map('string', 'variable')
+            Map::of('string', 'scalar|array')
         );
         $event2 = new Event(
             new Event\Name('bar'),
-            new Map('string', 'variable')
+            Map::of('string', 'scalar|array')
         );
 
         $client = new IPC(
@@ -104,7 +105,7 @@ class IPCTest extends TestCase
 
         $events = $client->events();
 
-        $this->assertInstanceOf(StreamInterface::class, $events);
+        $this->assertInstanceOf(Sequence::class, $events);
         $this->assertSame(Event::class, (string) $events->type());
         $this->assertCount(0, $events);
     }
@@ -114,11 +115,11 @@ class IPCTest extends TestCase
         $server = new Name('server');
         $event1 = new Event(
             new Event\Name('foo'),
-            new Map('string', 'variable')
+            Map::of('string', 'scalar|array')
         );
         $event2 = new Event(
             new Event\Name('bar'),
-            new Map('string', 'variable')
+            Map::of('string', 'scalar|array')
         );
 
         $client = new IPC(
@@ -154,9 +155,9 @@ class IPCTest extends TestCase
 
         $events = $client->events();
 
-        $this->assertInstanceOf(StreamInterface::class, $events);
+        $this->assertInstanceOf(Sequence::class, $events);
         $this->assertSame(Event::class, (string) $events->type());
         $this->assertCount(2, $events);
-        $this->assertEquals([$event1, $event2], $events->toPrimitive());
+        $this->assertEquals([$event1, $event2], unwrap($events));
     }
 }

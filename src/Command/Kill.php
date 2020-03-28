@@ -22,8 +22,8 @@ use Innmind\Immutable\Str;
 
 final class Kill implements Command
 {
-    private $status;
-    private $control;
+    private ServerStatus $status;
+    private ServerControl $control;
 
     public function __construct(ServerStatus $status, ServerControl $control)
     {
@@ -38,8 +38,8 @@ final class Kill implements Command
             ->processes()
             ->all()
             ->filter(static function(int $pid, Process $process): bool {
-                return Str::of((string) $process->command())->matches(
-                    '~installation-monitor oversee~'
+                return Str::of($process->command()->toString())->matches(
+                    '~installation-monitor oversee~',
                 );
             })
             ->foreach(function(int $pid, Process $process): void {
@@ -48,12 +48,12 @@ final class Kill implements Command
                     ->processes()
                     ->kill(
                         new Pid($process->pid()->toInt()),
-                        Signal::terminate()
+                        Signal::terminate(),
                     );
             });
     }
 
-    public function __toString(): string
+    public function toString(): string
     {
         return <<<USAGE
 kill

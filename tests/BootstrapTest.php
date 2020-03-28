@@ -10,6 +10,8 @@ use Innmind\InstallationMonitor\{
     Client,
 };
 use Innmind\OperatingSystem\OperatingSystem;
+use Innmind\Server\Status\Server;
+use Innmind\Url\Path;
 use Innmind\CLI\Commands;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +19,17 @@ class BootstrapTest extends TestCase
 {
     public function testBootstrap()
     {
-        $services = bootstrap($this->createMock(OperatingSystem::class));
+        $os = $this->createMock(OperatingSystem::class);
+        $os
+            ->expects($this->any())
+            ->method('status')
+            ->willReturn($status = $this->createMock(Server::class));
+        $status
+            ->expects($this->any())
+            ->method('tmp')
+            ->willReturn(Path::none());
+
+        $services = bootstrap($os);
 
         $this->assertCount(2, $services['client']);
         $this->assertIsCallable($services['client']['ipc']);

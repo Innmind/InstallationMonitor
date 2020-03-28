@@ -53,13 +53,13 @@ USAGE;
 
         $this->assertSame(
             $usage,
-            (string) new Oversee(
+            (new Oversee(
                 new Local(
                     $this->createMock(IPC::class),
                     new Name('installation-monitor')
                 ),
                 $this->createMock(Server::class)
-            )
+            ))->toString()
         );
     }
 
@@ -100,23 +100,23 @@ USAGE;
             ->expects($this->once())
             ->method('execute')
             ->with($this->callback(static function($command): bool {
-                return (string) $command === "installation-monitor 'oversee'" &&
+                return $command->toString() === "installation-monitor 'oversee'" &&
                     $command->toBeRunInBackground() &&
-                    $command->workingDirectory() === '/tmp';
+                    $command->workingDirectory()->toString() === '/tmp';
             }));
 
         $env = $this->createMock(Environment::class);
         $env
             ->expects($this->once())
             ->method('workingDirectory')
-            ->willReturn(new Path('/tmp'));
+            ->willReturn(Path::of('/tmp'));
 
         $this->assertNull($oversee(
             $env,
             new Arguments,
             new Options(
-                (new Map('string', 'mixed'))
-                    ->put('daemon', true)
+                Map::of('string', 'string')
+                    ('daemon', '')
             )
         ));
     }

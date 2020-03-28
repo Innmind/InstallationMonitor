@@ -1,10 +1,8 @@
 # Installation Monitor
 
-| `develop` |
-|-----------|
-| [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/?branch=develop) |
-| [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/?branch=develop) |
-| [![Build Status](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/build-status/develop) |
+[![Build Status](https://github.com/Innmind/InstallationMonitor/workflows/CI/badge.svg)](https://github.com/Innmind/InstallationMonitor/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/Innmind/InstallationMonitor/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/InstallationMonitor)
+[![Type Coverage](https://shepherd.dev/github/Innmind/InstallationMonitor/coverage.svg)](https://shepherd.dev/github/Innmind/InstallationMonitor)
 
 Tool to listen and redispatch events from/to other applications.
 
@@ -29,20 +27,23 @@ Then from your application you can send an event like so :
 ```php
 use function Innmind\InstallationMonitor\bootstrap;
 use Innmind\InstallationMonitor\Event;
-use Innmind\Immutable\Map;
+use Innmind\Immutable\{
+    Map,
+    Sequence,
+};
 
 $client = bootstrap()['client']['ipc']();
 $client->send(
     new Event(
         new Event\Name('foo'),
-        $payload = new Map('string', 'variable')
+        $payload = Map::of('string', 'scalar|array')
     ),
     new Event(
         new Event\Name('bar'),
-        $payload = new Map('string', 'variable')
+        $payload = Map::of('string', 'scalar|array')
     )
     // etc...
 );
 // or
-$client->events(); // Stream<Event> all the events recorded by the server
+$client->events(); // Sequence<Event> all the events recorded by the server
 ```

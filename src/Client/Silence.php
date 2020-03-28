@@ -7,14 +7,11 @@ use Innmind\InstallationMonitor\{
     Client,
     Event,
 };
-use Innmind\Immutable\{
-    StreamInterface,
-    Stream,
-};
+use Innmind\Immutable\Sequence;
 
 final class Silence implements Client
 {
-    private $client;
+    private Client $client;
 
     public function __construct(Client $client)
     {
@@ -33,12 +30,12 @@ final class Silence implements Client
     /**
      * {@inheritdoc}
      */
-    public function events(): StreamInterface
+    public function events(): Sequence
     {
         try {
             return $this->client->events();
         } catch (\RuntimeException $e) {
-            return Stream::of(Event::class);
+            return Sequence::of(Event::class);
         }
     }
 }
