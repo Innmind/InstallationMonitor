@@ -27,20 +27,23 @@ Then from your application you can send an event like so :
 ```php
 use function Innmind\InstallationMonitor\bootstrap;
 use Innmind\InstallationMonitor\Event;
-use Innmind\Immutable\Map;
+use Innmind\Immutable\{
+    Map,
+    Sequence,
+};
 
 $client = bootstrap()['client']['ipc']();
 $client->send(
     new Event(
         new Event\Name('foo'),
-        $payload = new Map('string', 'variable')
+        $payload = Map::of('string', 'scalar|array')
     ),
     new Event(
         new Event\Name('bar'),
-        $payload = new Map('string', 'variable')
+        $payload = Map::of('string', 'scalar|array')
     )
     // etc...
 );
 // or
-$client->events(); // Stream<Event> all the events recorded by the server
+$client->events(); // Sequence<Event> all the events recorded by the server
 ```
