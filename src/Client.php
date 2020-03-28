@@ -3,14 +3,14 @@ declare(strict_types = 1);
 
 namespace Innmind\InstallationMonitor;
 
-use Innmind\Immutable\StreamInterface;
+use Innmind\Immutable\Sequence;
 
 interface Client
 {
     public function send(Event ...$events): void;
 
     /**
-     * @return StreamInterface<Event>
+     * @return Sequence<Event>
      */
-    public function events(): StreamInterface;
+    public function events(): Sequence;
 }

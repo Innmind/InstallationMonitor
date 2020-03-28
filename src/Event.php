@@ -8,10 +8,9 @@ use Innmind\InstallationMonitor\{
     Exception\DomainException,
 };
 use Innmind\IPC\Message;
-use Innmind\Filesystem\MediaType\MediaType;
+use Innmind\MediaType\MediaType;
 use Innmind\Json\Json;
 use Innmind\Immutable\{
-    MapInterface,
     Map,
     Str,
 };
@@ -19,15 +18,15 @@ use Innmind\Immutable\{
 final class Event
 {
     private Name $name;
-    private MapInterface $payload;
+    private Map $payload;
 
-    public function __construct(Name $name, MapInterface $payload)
+    public function __construct(Name $name, Map $payload)
     {
         if (
             (string) $payload->keyType() !== 'string' ||
             (string) $payload->valueType() !== 'variable'
         ) {
-            throw new \TypeError('Argument 2 must be of type MapInterface<string, variable>');
+            throw new \TypeError('Argument 2 must be of type Map<string, variable>');
         }
 
         $this->name = $name;
@@ -40,27 +39,28 @@ final class Event
             $message->mediaType()->topLevel() !== 'application' ||
             $message->mediaType()->subType() !== 'json'
         ) {
-            throw new DomainException((string) $message->content());
+            throw new DomainException($message->content()->toString());
         }
 
-        $data = Json::decode((string) $message->content());
+        $data = Json::decode($message->content()->toString());
 
         if (
             !isset($data['name']) ||
             !isset($data['payload']) ||
             !\is_array($data['payload'])
         ) {
-            throw new DomainException((string) $message->content());
+            throw new DomainException($message->content()->toString());
+        }
+
+        $payload = Map::of('string', 'variable');
+
+        foreach ($data['payload'] as $key => $value) {
+            $payload = ($payload)($key, $value);
         }
 
         return new self(
             new Name($data['name']),
-            Map::of(
-                'string',
-                'variable',
-                \array_keys($data['payload']),
-                \array_values($data['payload'])
-            )
+            $payload,
         );
     }
 
@@ -70,16 +70,16 @@ final class Event
     }
 
     /**
-     * @return MapInterface<string, variable>
+     * @return Map<string, variable>
      */
-    public function payload(): MapInterface
+    public function payload(): Map
     {
         return $this->payload;
     }
 
     public function toMessage(): Message
     {
-        $content = new Str(Json::encode([
+        $content = Str::of(Json::encode([
             'name' => (string) $this->name(),
             'payload' => $this->payload()->reduce(
                 [],
@@ -92,7 +92,7 @@ final class Event
         ]));
 
         return new Message\Generic(
-            MediaType::fromString('application/json'),
+            MediaType::of('application/json'),
             $content
         );
     }

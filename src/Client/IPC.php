@@ -14,10 +14,7 @@ use Innmind\IPC\{
     Message,
     Exception\ConnectionClosed,
 };
-use Innmind\Immutable\{
-    StreamInterface,
-    Stream,
-};
+use Innmind\Immutable\Sequence;
 
 final class IPC implements Client
 {
@@ -50,10 +47,10 @@ final class IPC implements Client
     /**
      * {@inheritdoc}
      */
-    public function events(): StreamInterface
+    public function events(): Sequence
     {
         if (!$this->ipc->exist($this->server)) {
-            return Stream::of(Event::class);
+            return Sequence::of(Event::class);
         }
 
         $process = $this->ipc->get($this->server);
@@ -69,6 +66,6 @@ final class IPC implements Client
             // end of transmission
         }
 
-        return Stream::of(Event::class, ...$events);
+        return Sequence::of(Event::class, ...$events);
     }
 }

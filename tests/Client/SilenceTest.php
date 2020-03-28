@@ -10,7 +10,7 @@ use Innmind\InstallationMonitor\{
 };
 use Innmind\Immutable\{
     Map,
-    Stream,
+    Sequence,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -31,7 +31,7 @@ class SilenceTest extends TestCase
         );
         $event = new Event(
             new Event\Name('foo'),
-            new Map('string', 'variable')
+            Map::of('string', 'variable')
         );
         $inner
             ->expects($this->once())
@@ -53,7 +53,7 @@ class SilenceTest extends TestCase
 
         $this->assertNull($client->send(new Event(
             new Event\Name('foo'),
-            new Map('string', 'variable')
+            Map::of('string', 'variable')
         )));
     }
 
@@ -62,9 +62,9 @@ class SilenceTest extends TestCase
         $client = new Silence(
             $inner = $this->createMock(Client::class)
         );
-        $events = Stream::of(Event::class, new Event(
+        $events = Sequence::of(Event::class, new Event(
             new Event\Name('foo'),
-            new Map('string', 'variable')
+            Map::of('string', 'variable')
         ));
         $inner
             ->expects($this->once())
@@ -86,6 +86,6 @@ class SilenceTest extends TestCase
 
         $events = $client->events();
 
-        $this->assertTrue($events->equals(Stream::of(Event::class)));
+        $this->assertTrue($events->equals(Sequence::of(Event::class)));
     }
 }

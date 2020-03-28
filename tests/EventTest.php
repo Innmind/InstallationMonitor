@@ -9,7 +9,7 @@ use Innmind\InstallationMonitor\{
     Exception\DomainException,
 };
 use Innmind\IPC\Message\Generic as Message;
-use Innmind\Filesystem\MediaType\MediaType;
+use Innmind\MediaType\MediaType;
 use Innmind\Immutable\{
     Map,
     Str,
@@ -22,7 +22,7 @@ class EventTest extends TestCase
     {
         $event = new Event(
             $name = new Name('foo'),
-            $payload = new Map('string', 'variable')
+            $payload = Map::of('string', 'variable')
         );
 
         $this->assertSame($name, $event->name());
@@ -32,17 +32,17 @@ class EventTest extends TestCase
     public function testThrowWhenInvalidPayloadKey()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type MapInterface<string, variable>');
+        $this->expectExceptionMessage('Argument 2 must be of type Map<string, variable>');
 
-        new Event(new Name('foo'), new Map('scalar', 'variable'));
+        new Event(new Name('foo'), Map::of('scalar', 'variable'));
     }
 
     public function testThrowWhenInvalidPayloadValue()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type MapInterface<string, variable>');
+        $this->expectExceptionMessage('Argument 2 must be of type Map<string, variable>');
 
-        new Event(new Name('foo'), new Map('string', 'scalar'));
+        new Event(new Name('foo'), Map::of('string', 'scalar'));
     }
 
     /**
@@ -54,7 +54,7 @@ class EventTest extends TestCase
         $this->expectExceptionMessage('payload');
 
         Event::from(new Message(
-            MediaType::fromString($type),
+            MediaType::of($type),
             Str::of('payload')
         ));
     }
@@ -68,7 +68,7 @@ class EventTest extends TestCase
         $this->expectExceptionMessage($string);
 
         Event::from(new Message(
-            MediaType::fromString('application/json'),
+            MediaType::of('application/json'),
             Str::of($string)
         ));
     }
@@ -76,7 +76,7 @@ class EventTest extends TestCase
     public function testBuildFromMessage()
     {
         $event = Event::from(new Message(
-            MediaType::fromString('application/json'),
+            MediaType::of('application/json'),
             Str::of('{"name":"foo","payload":{"foo":42,"bar":"baz"}}')
         ));
 
@@ -93,7 +93,7 @@ class EventTest extends TestCase
     {
         $event = new Event(
             new Name('foo'),
-            (new Map('string', 'variable'))
+            (Map::of('string', 'variable'))
                 ->put('foo', 42)
                 ->put('bar', 'baz')
         );
@@ -101,10 +101,10 @@ class EventTest extends TestCase
         $message = $event->toMessage();
 
         $this->assertInstanceOf(Message::class, $message);
-        $this->assertSame('application/json', (string) $message->mediaType());
+        $this->assertSame('application/json', $message->mediaType()->toString());
         $this->assertSame(
             '{"name":"foo","payload":{"foo":42,"bar":"baz"}}',
-            (string) $message->content()
+            $message->content()->toString(),
         );
     }
 

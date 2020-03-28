@@ -4,15 +4,15 @@ declare(strict_types = 1);
 namespace Innmind\InstallationMonitor;
 
 use Innmind\IPC\Client;
-use Innmind\Immutable\Stream;
+use Innmind\Immutable\Sequence;
 
 final class Store
 {
-    private Stream $events;
+    private Sequence $events;
 
     public function __construct()
     {
-        $this->events = Stream::of(Event::class);
+        $this->events = Sequence::of(Event::class);
     }
 
     public function remember(Event $event): void

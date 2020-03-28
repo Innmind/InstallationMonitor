@@ -37,7 +37,7 @@ class FunctionalTest extends TestCase
         $events = $client->events();
 
         $this->assertCount(1, $events);
-        $this->assertEquals($event, $events->current());
+        $this->assertEquals($event, $events->first());
 
         $os->control()->processes()->kill(
             $server->pid(),

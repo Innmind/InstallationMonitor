@@ -38,7 +38,7 @@ final class Kill implements Command
             ->processes()
             ->all()
             ->filter(static function(int $pid, Process $process): bool {
-                return Str::of((string) $process->command())->matches(
+                return Str::of($process->command()->toString())->matches(
                     '~installation-monitor oversee~'
                 );
             })
@@ -53,7 +53,7 @@ final class Kill implements Command
             });
     }
 
-    public function __toString(): string
+    public function toString(): string
     {
         return <<<USAGE
 kill

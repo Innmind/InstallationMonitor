@@ -12,7 +12,7 @@ use Innmind\IPC\{
     Message\Generic as Message,
     Client,
 };
-use Innmind\Filesystem\MediaType\MediaType;
+use Innmind\MediaType\MediaType;
 use Innmind\Immutable\{
     Map,
     Str,
@@ -27,25 +27,25 @@ class StoreTest extends TestCase
 
         $this->assertNull($store->remember(new Event(
             new Name('foo'),
-            new Map('string', 'variable')
+            Map::of('string', 'variable')
         )));
         $this->assertNull($store->remember(new Event(
             new Name('bar'),
-            new Map('string', 'variable')
+            Map::of('string', 'variable')
         )));
         $client = $this->createMock(Client::class);
         $client
             ->expects($this->at(0))
             ->method('send')
             ->with(new Message(
-                MediaType::fromString('application/json'),
+                MediaType::of('application/json'),
                 Str::of('{"name":"foo","payload":[]}')
             ));
         $client
             ->expects($this->at(1))
             ->method('send')
             ->with(new Message(
-                MediaType::fromString('application/json'),
+                MediaType::of('application/json'),
                 Str::of('{"name":"bar","payload":[]}')
             ));
         $this->assertNull($store->notify($client));

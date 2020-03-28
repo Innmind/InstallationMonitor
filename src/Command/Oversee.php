@@ -35,7 +35,7 @@ final class Oversee implements Command
                 ->execute(
                     ServerCommand::background('installation-monitor')
                         ->withArgument('oversee')
-                        ->withWorkingDirectory((string) $env->workingDirectory())
+                        ->withWorkingDirectory($env->workingDirectory())
                 );
 
             return;
@@ -44,7 +44,7 @@ final class Oversee implements Command
         ($this->listen)();
     }
 
-    public function __toString(): string
+    public function toString(): string
     {
         return <<<USAGE
 oversee -d|--daemon
