@@ -1,10 +1,8 @@
 # Installation Monitor
 
-| `develop` |
-|-----------|
-| [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/?branch=develop) |
-| [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/?branch=develop) |
-| [![Build Status](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/InstallationMonitor/build-status/develop) |
+[![Build Status](https://github.com/Innmind/InstallationMonitor/workflows/CI/badge.svg)](https://github.com/Innmind/InstallationMonitor/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/Innmind/InstallationMonitor/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/InstallationMonitor)
+[![Type Coverage](https://shepherd.dev/github/Innmind/InstallationMonitor/coverage.svg)](https://shepherd.dev/github/Innmind/InstallationMonitor)
 
 Tool to listen and redispatch events from/to other applications.
 
