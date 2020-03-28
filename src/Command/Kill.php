@@ -39,7 +39,7 @@ final class Kill implements Command
             ->all()
             ->filter(static function(int $pid, Process $process): bool {
                 return Str::of($process->command()->toString())->matches(
-                    '~installation-monitor oversee~'
+                    '~installation-monitor oversee~',
                 );
             })
             ->foreach(function(int $pid, Process $process): void {
@@ -48,7 +48,7 @@ final class Kill implements Command
                     ->processes()
                     ->kill(
                         new Pid($process->pid()->toInt()),
-                        Signal::terminate()
+                        Signal::terminate(),
                     );
             });
     }

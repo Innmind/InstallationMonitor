@@ -35,7 +35,7 @@ final class Oversee implements Command
                 ->execute(
                     ServerCommand::background('installation-monitor')
                         ->withArgument('oversee')
-                        ->withWorkingDirectory($env->workingDirectory())
+                        ->withWorkingDirectory($env->workingDirectory()),
                 );
 
             return;

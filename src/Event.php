@@ -14,6 +14,7 @@ use Innmind\Immutable\{
     Map,
     Str,
 };
+use function Innmind\Immutable\assertMap;
 
 final class Event
 {
@@ -26,12 +27,7 @@ final class Event
      */
     public function __construct(Name $name, Map $payload)
     {
-        if (
-            (string) $payload->keyType() !== 'string' ||
-            (string) $payload->valueType() !== 'scalar|array'
-        ) {
-            throw new \TypeError('Argument 2 must be of type Map<string, scalar|array>');
-        }
+        assertMap('string', 'scalar|array', $payload, 2);
 
         $this->name = $name;
         $this->payload = $payload;
@@ -94,13 +90,13 @@ final class Event
                     $carry[$key] = $value;
 
                     return $carry;
-                }
+                },
             ),
         ]));
 
         return new Message\Generic(
             MediaType::of('application/json'),
-            $content
+            $content,
         );
     }
 }

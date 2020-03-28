@@ -17,18 +17,13 @@ final class Store
 
     public function remember(Event $event): void
     {
-        $this->events = $this->events->add($event);
+        $this->events = ($this->events)($event);
     }
 
     public function notify(Client $client): void
     {
-        $this->events->reduce(
-            $client,
-            static function(Client $client, Event $event): Client {
-                $client->send($event->toMessage());
-
-                return $client;
-            }
+        $this->events->foreach(
+            static fn(Event $event) => $client->send($event->toMessage()),
         );
     }
 }
