@@ -27,11 +27,11 @@ class StoreTest extends TestCase
 
         $this->assertNull($store->remember(new Event(
             new Name('foo'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
         )));
         $this->assertNull($store->remember(new Event(
             new Name('bar'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
         )));
         $client = $this->createMock(Client::class);
         $client

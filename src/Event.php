@@ -18,15 +18,19 @@ use Innmind\Immutable\{
 final class Event
 {
     private Name $name;
+    /** @var Map<string, scalar|array> */
     private Map $payload;
 
+    /**
+     * @param Map<string, scalar|array> $payload
+     */
     public function __construct(Name $name, Map $payload)
     {
         if (
             (string) $payload->keyType() !== 'string' ||
-            (string) $payload->valueType() !== 'variable'
+            (string) $payload->valueType() !== 'scalar|array'
         ) {
-            throw new \TypeError('Argument 2 must be of type Map<string, variable>');
+            throw new \TypeError('Argument 2 must be of type Map<string, scalar|array>');
         }
 
         $this->name = $name;
@@ -42,8 +46,10 @@ final class Event
             throw new DomainException($message->content()->toString());
         }
 
+        /** @var array{name: string, payload: array<string, scalar|array>} */
         $data = Json::decode($message->content()->toString());
 
+        /** @psalm-suppress DocblockTypeContradiction */
         if (
             !isset($data['name']) ||
             !isset($data['payload']) ||
@@ -52,7 +58,8 @@ final class Event
             throw new DomainException($message->content()->toString());
         }
 
-        $payload = Map::of('string', 'variable');
+        /** @var Map<string, scalar|array> */
+        $payload = Map::of('string', 'scalar|array');
 
         foreach ($data['payload'] as $key => $value) {
             $payload = ($payload)($key, $value);
@@ -70,7 +77,7 @@ final class Event
     }
 
     /**
-     * @return Map<string, variable>
+     * @return Map<string, scalar|array>
      */
     public function payload(): Map
     {

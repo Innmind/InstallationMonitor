@@ -22,7 +22,7 @@ class EventTest extends TestCase
     {
         $event = new Event(
             $name = new Name('foo'),
-            $payload = Map::of('string', 'variable')
+            $payload = Map::of('string', 'scalar|array')
         );
 
         $this->assertSame($name, $event->name());
@@ -32,15 +32,15 @@ class EventTest extends TestCase
     public function testThrowWhenInvalidPayloadKey()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type Map<string, variable>');
+        $this->expectExceptionMessage('Argument 2 must be of type Map<string, scalar|array>');
 
-        new Event(new Name('foo'), Map::of('scalar', 'variable'));
+        new Event(new Name('foo'), Map::of('scalar', 'scalar|array'));
     }
 
     public function testThrowWhenInvalidPayloadValue()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type Map<string, variable>');
+        $this->expectExceptionMessage('Argument 2 must be of type Map<string, scalar|array>');
 
         new Event(new Name('foo'), Map::of('string', 'scalar'));
     }
@@ -83,7 +83,7 @@ class EventTest extends TestCase
         $this->assertInstanceOf(Event::class, $event);
         $this->assertSame('foo', (string) $event->name());
         $this->assertSame('string', (string) $event->payload()->keyType());
-        $this->assertSame('variable', (string) $event->payload()->valueType());
+        $this->assertSame('scalar|array', (string) $event->payload()->valueType());
         $this->assertCount(2, $event->payload());
         $this->assertSame(42, $event->payload()->get('foo'));
         $this->assertSame('baz', $event->payload()->get('bar'));
@@ -93,9 +93,9 @@ class EventTest extends TestCase
     {
         $event = new Event(
             new Name('foo'),
-            (Map::of('string', 'variable'))
-                ->put('foo', 42)
-                ->put('bar', 'baz')
+            Map::of('string', 'scalar|array')
+                ('foo', 42)
+                ('bar', 'baz')
         );
 
         $message = $event->toMessage();

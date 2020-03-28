@@ -50,7 +50,7 @@ class IPCTest extends TestCase
 
         $this->assertNull($client->send(new Event(
             new Event\Name('foo'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
         )));
     }
 
@@ -59,11 +59,11 @@ class IPCTest extends TestCase
         $server = new Name('foo');
         $event1 = new Event(
             new Event\Name('foo'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
         );
         $event2 = new Event(
             new Event\Name('bar'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
         );
 
         $client = new IPC(
@@ -115,11 +115,11 @@ class IPCTest extends TestCase
         $server = new Name('server');
         $event1 = new Event(
             new Event\Name('foo'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
         );
         $event2 = new Event(
             new Event\Name('bar'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
         );
 
         $client = new IPC(

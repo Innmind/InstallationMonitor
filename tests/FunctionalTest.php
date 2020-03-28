@@ -30,7 +30,7 @@ class FunctionalTest extends TestCase
         $client = bootstrap($os)['client']['ipc']();
         $event = new Event(
             new Event\Name('test'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
                 ('foo', 42)
         );
         $client->send($event);

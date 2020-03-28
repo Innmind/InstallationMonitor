@@ -31,7 +31,7 @@ class SilenceTest extends TestCase
         );
         $event = new Event(
             new Event\Name('foo'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
         );
         $inner
             ->expects($this->once())
@@ -53,7 +53,7 @@ class SilenceTest extends TestCase
 
         $this->assertNull($client->send(new Event(
             new Event\Name('foo'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
         )));
     }
 
@@ -64,7 +64,7 @@ class SilenceTest extends TestCase
         );
         $events = Sequence::of(Event::class, new Event(
             new Event\Name('foo'),
-            Map::of('string', 'variable')
+            Map::of('string', 'scalar|array')
         ));
         $inner
             ->expects($this->once())
