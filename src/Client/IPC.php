@@ -21,8 +21,8 @@ use Innmind\Immutable\{
 
 final class IPC implements Client
 {
-    private $ipc;
-    private $server;
+    private IPCInterface $ipc;
+    private Name $server;
 
     public function __construct(IPCInterface $ipc, Name $server)
     {

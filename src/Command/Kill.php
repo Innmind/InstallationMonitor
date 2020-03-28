@@ -22,8 +22,8 @@ use Innmind\Immutable\Str;
 
 final class Kill implements Command
 {
-    private $status;
-    private $control;
+    private ServerStatus $status;
+    private ServerControl $control;
 
     public function __construct(ServerStatus $status, ServerControl $control)
     {

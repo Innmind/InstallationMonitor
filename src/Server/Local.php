@@ -18,9 +18,9 @@ use Innmind\IPC\{
 
 final class Local
 {
-    private $ipc;
-    private $name;
-    private $store;
+    private IPC $ipc;
+    private Name $name;
+    private Store $store;
 
     public function __construct(IPC $ipc, Name $name)
     {

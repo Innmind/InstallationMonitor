@@ -18,8 +18,8 @@ use Innmind\Immutable\{
 
 final class Event
 {
-    private $name;
-    private $payload;
+    private Name $name;
+    private MapInterface $payload;
 
     public function __construct(Name $name, MapInterface $payload)
     {

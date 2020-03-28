@@ -8,7 +8,7 @@ use Innmind\Immutable\Stream;
 
 final class Store
 {
-    private $events;
+    private Stream $events;
 
     public function __construct()
     {

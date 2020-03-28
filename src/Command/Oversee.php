@@ -17,8 +17,8 @@ use Innmind\Server\Control\{
 
 final class Oversee implements Command
 {
-    private $listen;
-    private $server;
+    private Local $listen;
+    private Server $server;
 
     public function __construct(Local $listen, Server $server)
     {

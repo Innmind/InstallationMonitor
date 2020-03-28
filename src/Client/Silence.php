@@ -14,7 +14,7 @@ use Innmind\Immutable\{
 
 final class Silence implements Client
 {
-    private $client;
+    private Client $client;
 
     public function __construct(Client $client)
     {
