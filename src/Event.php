@@ -83,7 +83,7 @@ final class Event
     public function toMessage(): Message
     {
         $content = Str::of(Json::encode([
-            'name' => (string) $this->name(),
+            'name' => $this->name()->toString(),
             'payload' => $this->payload()->reduce(
                 [],
                 static function(array $carry, string $key, $value): array {
