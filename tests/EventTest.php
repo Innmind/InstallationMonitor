@@ -81,7 +81,7 @@ class EventTest extends TestCase
         ));
 
         $this->assertInstanceOf(Event::class, $event);
-        $this->assertSame('foo', (string) $event->name());
+        $this->assertSame('foo', $event->name()->toString());
         $this->assertSame('string', (string) $event->payload()->keyType());
         $this->assertSame('scalar|array', (string) $event->payload()->valueType());
         $this->assertCount(2, $event->payload());
