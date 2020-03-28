@@ -8,6 +8,9 @@ use Innmind\CLI\Commands;
 use Innmind\IPC\Process\Name;
 use function Innmind\IPC\bootstrap as ipc;
 
+/**
+ * @return array{local_server_name: Name, commands: callable(): Commands, client: array{ipc: callable(): Client, silence: callable(Client): Client}}
+ */
 function bootstrap(OperatingSystem $os): array
 {
     $localServerName = new Name('installation-monitor');
