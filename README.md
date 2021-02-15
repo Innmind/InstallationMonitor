@@ -1,6 +1,6 @@
 # Installation Monitor
 
-[![Build Status](https://github.com/Innmind/InstallationMonitor/workflows/CI/badge.svg)](https://github.com/Innmind/InstallationMonitor/actions?query=workflow%3ACI)
+[![Build Status](https://github.com/Innmind/InstallationMonitor/workflows/CI/badge.svg?branch=master)](https://github.com/Innmind/InstallationMonitor/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/Innmind/InstallationMonitor/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/InstallationMonitor)
 [![Type Coverage](https://shepherd.dev/github/Innmind/InstallationMonitor/coverage.svg)](https://shepherd.dev/github/Innmind/InstallationMonitor)
 
