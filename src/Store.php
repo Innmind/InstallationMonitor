@@ -8,6 +8,7 @@ use Innmind\Immutable\Sequence;
 
 final class Store
 {
+    /** @var Sequence<Event> */
     private Sequence $events;
 
     public function __construct()

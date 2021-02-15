@@ -104,18 +104,17 @@ USAGE;
             ->method('processes')
             ->willReturn($processes = $this->createMock(ServerControl\Processes::class));
         $processes
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('kill')
-            ->with(
-                new ServerControl\Process\Pid(2),
-                ServerControl\Signal::terminate()
-            );
-        $processes
-            ->expects($this->at(1))
-            ->method('kill')
-            ->with(
-                new ServerControl\Process\Pid(4),
-                ServerControl\Signal::terminate()
+            ->withConsecutive(
+                [
+                    new ServerControl\Process\Pid(2),
+                    ServerControl\Signal::terminate(),
+                ],
+                [
+                    new ServerControl\Process\Pid(4),
+                    ServerControl\Signal::terminate(),
+                ],
             );
 
         $this->assertNull($kill(

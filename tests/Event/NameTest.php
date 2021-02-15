@@ -8,25 +8,22 @@ use Innmind\InstallationMonitor\{
     Exception\DomainException,
 };
 use PHPUnit\Framework\TestCase;
-use Eris\{
-    Generator,
-    TestTrait,
+use Innmind\BlackBox\{
+    PHPUnit\BlackBox,
+    Set,
 };
 
 class NameTest extends TestCase
 {
-    use TestTrait;
+    use BlackBox;
 
     public function testInterface()
     {
-       $this
-        ->forAll(Generator\string())
-        ->when(static function(string $string): bool {
-            return $string !== '';
-        })
-        ->then(function(string $string): void {
-            $this->assertSame($string, (new Name($string))->toString());
-        });
+        $this
+            ->forAll(Set\Strings::any()->filter(static fn($string) => $string !== ''))
+            ->then(function(string $string): void {
+                $this->assertSame($string, (new Name($string))->toString());
+            });
     }
 
     public function testThrowWhenEmptyName()

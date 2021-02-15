@@ -25,7 +25,7 @@ class FunctionalTest extends TestCase
                 Command::foreground('./installation-monitor')
                     ->withArgument('oversee')
             );
-        sleep(1);
+        \sleep(1);
 
         $client = bootstrap($os)['client']['ipc']();
         $event = new Event(
