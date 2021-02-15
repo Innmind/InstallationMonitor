@@ -27,9 +27,6 @@ final class Silence implements Client
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function events(): Sequence
     {
         try {

@@ -19,11 +19,11 @@ class NameTest extends TestCase
 
     public function testInterface()
     {
-       $this
-        ->forAll(Set\Strings::any()->filter(static fn($string) => $string !== ''))
-        ->then(function(string $string): void {
-            $this->assertSame($string, (new Name($string))->toString());
-        });
+        $this
+            ->forAll(Set\Strings::any()->filter(static fn($string) => $string !== ''))
+            ->then(function(string $string): void {
+                $this->assertSame($string, (new Name($string))->toString());
+            });
     }
 
     public function testThrowWhenEmptyName()

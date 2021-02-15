@@ -109,11 +109,11 @@ USAGE;
             ->withConsecutive(
                 [
                     new ServerControl\Process\Pid(2),
-                    ServerControl\Signal::terminate()
+                    ServerControl\Signal::terminate(),
                 ],
                 [
                     new ServerControl\Process\Pid(4),
-                    ServerControl\Signal::terminate()
+                    ServerControl\Signal::terminate(),
                 ],
             );
 

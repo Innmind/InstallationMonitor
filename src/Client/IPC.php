@@ -44,9 +44,6 @@ final class IPC implements Client
         $process->close();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function events(): Sequence
     {
         if (!$this->ipc->exist($this->server)) {
