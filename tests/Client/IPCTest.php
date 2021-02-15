@@ -71,21 +71,21 @@ class IPCTest extends TestCase
             $server
         );
         $ipc
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('exist')
             ->with($server)
             ->willReturn(true);
         $ipc
-            ->expects($this->at(1))
+            ->expects($this->once())
             ->method('get')
             ->with($server)
             ->willReturn($process = $this->createMock(Process::class));
         $process
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('send')
             ->with($event1->toMessage(), $event2->toMessage());
         $process
-            ->expects($this->at(1))
+            ->expects($this->once())
             ->method('close');
 
         $this->assertNull($client->send($event1, $event2));
@@ -127,31 +127,27 @@ class IPCTest extends TestCase
             $server
         );
         $ipc
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('exist')
             ->with($server)
             ->willReturn(true);
         $ipc
-            ->expects($this->at(1))
+            ->expects($this->once())
             ->method('get')
             ->with($server)
             ->willReturn($process = $this->createMock(Process::class));
         $process
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('send')
             ->with(new WaitingForEvents);
         $process
-            ->expects($this->at(1))
+            ->expects($this->exactly(3))
             ->method('wait')
-            ->willReturn($event1->toMessage());
-        $process
-            ->expects($this->at(2))
-            ->method('wait')
-            ->willReturn($event2->toMessage());
-        $process
-            ->expects($this->at(3))
-            ->method('wait')
-            ->will($this->throwException(new ConnectionClosed));
+            ->will($this->onConsecutiveCalls(
+                $event1->toMessage(),
+                $event2->toMessage(),
+                $this->throwException(new ConnectionClosed)
+            ));
 
         $events = $client->events();
 

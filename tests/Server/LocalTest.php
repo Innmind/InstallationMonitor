@@ -38,7 +38,7 @@ class LocalTest extends TestCase
         );
         $waitingForEvents = new WaitingForEvents;
         $ipc
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('listen')
             ->with($name)
             ->willReturn($server = $this->createMock(Server::class));
@@ -53,11 +53,11 @@ class LocalTest extends TestCase
                 return true;
             }));
         $sender
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('send')
             ->with($event);
         $sender
-            ->expects($this->at(1))
+            ->expects($this->once())
             ->method('close');
 
         $this->assertNull($listen());
