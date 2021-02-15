@@ -45,7 +45,10 @@ final class Event
         /** @var array{name: string, payload: array<string, scalar|array>} */
         $data = Json::decode($message->content()->toString());
 
-        /** @psalm-suppress DocblockTypeContradiction */
+        /**
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         if (
             !isset($data['name']) ||
             !isset($data['payload']) ||
